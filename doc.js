@@ -1,4 +1,4 @@
-var ManPageFilter = function () {
+var ManPageFilter = function() {
     this.man_content_container = $('#man-content');
     this.filter_box_relative = $('#toctitle');
 
@@ -14,7 +14,7 @@ var ManPageFilter = function () {
  * contents of the man page. It also initializes the search index.
  */
 ManPageFilter.prototype.initializeData = function() {
-}
+};
 
 /**
  * Show the information, that this is not the official source of the nodejs api,
@@ -29,7 +29,74 @@ ManPageFilter.prototype.setupUnofficialNotice = function() {
     ].join('');
 
     $('h1').after($(info_box_html));
-}
+};
+
+/**
+ * Take a given element (is either h2, h3 or h4) and create a navigation node for this element.
+ */
+ManPageFilter.prototype.createNavigationNode = function(element) {
+    element = $(element);
+
+    var new_navigation_element = $('<li />');
+    new_navigation_element.addClass('topLevel');
+
+    var new_navigaton_element_link = $('<a href="#' + element.attr('id') + '" />');
+    new_navigaton_element_link.text(element.text().replace(/\(.*\)$/gi, ""));
+    
+    new_navigaton_element_link.click(function(event) {
+        /*
+         * It's unknown, because invisible? Let's go to top!
+         */
+        if (element.css('display') === 'none') {
+            $('#man').animate({
+                scrollTop: 0
+            }, 500);
+        } else {
+            var targetOffset = element.offset().top;
+            $('#man').animate({
+                scrollTop: targetOffset
+            }, 500);
+        }
+        event.preventDefault();
+        return true;
+    });
+    
+    new_navigation_element.append(new_navigaton_element_link);
+    
+    return new_navigation_element[0];
+};
+
+/**
+ * As soon as we notice that a specific navigation node with a parent is
+ * reached, we create a expandable children navigation node and return it.
+ */
+ManPageFilter.prototype.createExpandableChildrenNavigation = function(parent_navigation_node) {
+    var children_node = $('<ul style="display: none" />');
+    /**
+     * The +/- button to toggle the parent's open/closed state.
+     */
+    var open_parent_node = $('<a href="#" class="toggler">+</a>');
+    open_parent_node.click(function(event) {
+        var is_open = children_node.css('display') === 'none' ? false : true;
+
+        if (is_open) {
+            open_parent_node.text('+');
+            children_node.slideUp();
+        } else {
+            open_parent_node.text('-');
+            children_node.slideDown();
+        }
+        event.preventDefault();
+        return false;
+    });
+    
+    parent_navigation_node.prepend(open_parent_node);
+    parent_navigation_node.append(children_node);
+
+    parent_navigation_node.removeClass('topLevel');
+    
+    return children_node;
+};
 
 ManPageFilter.prototype.rest = function() {
     var self = this;
@@ -90,16 +157,6 @@ ManPageFilter.prototype.rest = function() {
         "h3": true,
         "h4": true
     };
-
-    /**
-     * The current's element parent navigation node.
-     */
-    var parent_navigation_node = null;
-
-    /**
-     * The +/- button to toggle the parent's open/closed state.
-     */
-    var open_parent_node = null;
 
     /*
      * To know which (navigation/dom) items to hide, when a specific filter is
@@ -181,64 +238,15 @@ ManPageFilter.prototype.rest = function() {
             }
 
             if (new_level === level) {
-
-                new_navigation_element = $('<li />');
-                new_navigation_element.addClass('topLevel');
-
-                new_navigaton_element_link = $('<a href="#' + element_id + '" />');
-                new_navigaton_element_link.css('pointer', 'cursor');
-                new_navigaton_element_link.text(element.text().replace(/\(.*\)$/gi, ""));
-
-                (function(element) {
-                    new_navigaton_element_link.click(function(event) {
-                        /*
-                         * It's unknown, because invisible? Let's go to top!
-                         */
-                        if (element.css('display') === 'none') {
-                            $('#man').animate( {
-                                scrollTop: 0
-                            }, 500);
-                        } else {
-                            var targetOffset = element.offset().top;
-                            $('#man').animate( {
-                                scrollTop: targetOffset
-                            }, 500);
-                        }
-                        event.preventDefault();
-                        return true;
-                    });
-                }($(element)));
-
-                new_navigation_element.append(new_navigaton_element_link);
+                element_navigation_node[i] = this.createNavigationNode(element);
 
                 /*
                  * Ok, we don't have that <ul> for the children, yet.
                  */
                 if (navigation_stack[level - 1] === true) {
-                    navigation_stack[level - 1] = $('<ul style="display: none" />')[0];
-                    parent_navigation_node = $(element_navigation_node[navigation_parent_stack[level - 1]]);
-                    open_parent_node = $('<a href="#" class="toggler">+</a>');
-                    (function(ul_to_toggle, open_parent_node) {
-                        open_parent_node.click(function(event) {
-                            var is_open = ul_to_toggle.css('display') === 'none' ? false : true;
-
-                            if (is_open) {
-                                open_parent_node.text('+');
-                                ul_to_toggle.slideUp();
-                            } else {
-                                open_parent_node.text('-');
-                                ul_to_toggle.slideDown();
-                            }
-                            event.preventDefault();
-                            return false;
-                        });
-                    }($(navigation_stack[level - 1]), $(open_parent_node)));
-                    parent_navigation_node.prepend(open_parent_node);
-                    parent_navigation_node.append(navigation_stack[level - 1]);
-
-                    parent_navigation_node.removeClass('topLevel');
+                    navigation_stack[level - 1] = this.createExpandableChildrenNavigation($(element_navigation_node[navigation_parent_stack[level - 1]]));
                 }
-                $(navigation_stack[level - 1]).append(new_navigation_element);
+                $(navigation_stack[level - 1]).append(element_navigation_node[i]);
 
                 /*
                  * We'll put true on the stack, and in case we add children,
@@ -250,8 +258,6 @@ ManPageFilter.prototype.rest = function() {
                 navigation_parent_stack.push(i);
 
                 element_search_texts[i].push(navigation_text_stack.join(' '));
-
-                element_navigation_node[i] = new_navigation_element[0];
             }
         } else {
             element_navigation_node[i] = false;
@@ -320,8 +326,10 @@ ManPageFilter.prototype.rest = function() {
         if (elements_found === elements_length) {
             search_result_info.slideUp();
         } else {
-            search_result_info.text('Filtered Results: Hiding ' + Math.floor(10000 - elements_found * 10000 / elements_length) / 100
-                    + '% (took ' + ((new Date()).getTime() - u.getTime()) + 'ms)');
+            search_result_info.text([
+                'Filtered Results: Hiding ', Math.floor(10000 - elements_found * 10000 / elements_length) / 100, '% (took ',
+                ((new Date()).getTime() - u.getTime()), 'ms)'
+            ].join(''));
             search_result_info.slideDown();
         }
 
