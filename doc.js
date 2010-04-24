@@ -1,3 +1,11 @@
+/**
+ * A ManPageFilter for the Man-Pages created with Ronn. Made for node.JS.
+ * 
+ * About: http://dracoblue.net/dev/enhanced-api-browser-for-nodejs/168/
+ * 
+ * Copyright (c) 2010 by DracoBlue (JanS@DracoBlue.de). Licensed under the terms
+ * of MIT.
+ */
 var ManPageFilter = function() {
     this.man_content_container = $('#man-content');
     this.filter_box_relative = $('#toctitle');
@@ -9,14 +17,14 @@ var ManPageFilter = function() {
     this.elements_first_header_index = null;
 
     this.table_of_contents = null;
-    
+
     this.initializeData();
 
     this.filter_box_relative.after(this.table_of_contents);
 
     var search_result_info = this.setupSearchResultInfo();
     var search_field = this.setupSearchField(search_result_info);
-    
+
     this.filter_box_relative.after(search_field);
     this.filter_box_relative.after($('<div style="font-size: 70%">Filter:</div>'));
     $('h1').after(search_result_info);
@@ -32,7 +40,7 @@ ManPageFilter.prototype.setupSearchField = function(search_result_info) {
     var self = this;
 
     var search_field = $('<input style="width: 160px; margin-bottom: 10px;" />');
-    
+
     var previous_text = "";
 
     var checkForSearchChangeHandler = function(event) {
