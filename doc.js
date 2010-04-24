@@ -5,27 +5,34 @@ var ManPageFilter = function() {
     this.element_navigation_node = null;
     this.elements = null;
     this.element_search_texts = null;
-    
+
     this.elements_first_header_index = null;
 
     this.table_of_contents = null;
-
+    
     this.initializeData();
 
     this.filter_box_relative.after(this.table_of_contents);
 
-    this.setupSearchField();
+    var search_result_info = this.setupSearchResultInfo();
+    var search_field = this.setupSearchField(search_result_info);
+    
+    this.filter_box_relative.after(search_field);
+    this.filter_box_relative.after($('<div style="font-size: 70%">Filter:</div>'));
+    $('h1').after(search_result_info);
+
     this.setupUnofficialNotice();
 };
 
-ManPageFilter.prototype.setupSearchField = function() {
+ManPageFilter.prototype.setupSearchResultInfo = function(search_result_info) {
+    return $('<div style="display: none; background-color: #121314; padding: 10px;" />');
+};
+
+ManPageFilter.prototype.setupSearchField = function(search_result_info) {
     var self = this;
 
-    var elements = this.elements;
-    var elements_length = elements.length;
-
     var search_field = $('<input style="width: 160px; margin-bottom: 10px;" />');
-    var search_result_info = $('<div style="display: none; background-color: #121314; padding: 10px;"></div>');
+    
     var previous_text = "";
 
     var checkForSearchChangeHandler = function(event) {
@@ -48,11 +55,11 @@ ManPageFilter.prototype.setupSearchField = function() {
             elements_found = self.filterElements(text);
         }
 
-        if (elements_found === elements_length) {
+        if (elements_found === self.elements.length) {
             search_result_info.slideUp();
         } else {
             search_result_info.text([
-                'Filtered Results: Hiding ', Math.floor(10000 - elements_found * 10000 / elements_length) / 100, '% (took ',
+                'Filtered Results: Hiding ', Math.floor(10000 - elements_found * 10000 / self.elements.length) / 100, '% (took ',
                 ((new Date()).getTime() - u.getTime()), 'ms)'
             ].join(''));
 
@@ -73,10 +80,7 @@ ManPageFilter.prototype.setupSearchField = function() {
 
     search_field.keyup(delayedCheckForSearchChangeHandler).change(delayedCheckForSearchChangeHandler);
 
-    this.filter_box_relative.after(search_field);
-    this.filter_box_relative.after($('<div style="font-size: 70%">Filter:</div>'));
-
-    $('h1').after(search_result_info);
+    return search_field;
 };
 
 /**
@@ -267,7 +271,7 @@ ManPageFilter.prototype.initializeData = function() {
     var new_navigation_element = null;
 
     /**
-     * A small helper map, we'll use to check wether a tag is a header or not.
+     * A small helper map, we'll use to check whether a tag is a header or not.
      */
     var is_header_tag = {
         "h2": true,
@@ -277,13 +281,13 @@ ManPageFilter.prototype.initializeData = function() {
 
     /*
      * To know which (navigation/dom) items to hide, when a specific filter is
-     * applied, we'll store some extra information while we are working through
+     * applied, we'll store some extra information while we are walking through
      * the nodes.
      * 
      * Those are suffixed with stack. The first element [0] is always the root
      * node.
      * 
-     * The stack is like a breadcrumb for the current element.
+     * The stack is like a bread crumb for the current element.
      */
 
     this.table_of_contents = $('<ul />')[0];
@@ -336,9 +340,10 @@ ManPageFilter.prototype.initializeData = function() {
 
         if (typeof is_header_tag[tag_name] !== 'undefined') {
             new_level = Number(tag_name.substr(1, 1)) - 1;
-            
+
             /*
-             * Let's remember where we started with headings, so we won't hide anything except the content.
+             * Let's remember where we started with headings, so we won't hide
+             * anything except the content.
              */
             if (this.elements_first_header_index === null) {
                 this.elements_first_header_index = i;
