@@ -1,15 +1,13 @@
 var ManPageFilter = function () {
     this.man_content_container = $('#man-content');
     this.filter_box_relative = $('#toctitle');
-};
 
-ManPageFilter.prototype.initialize = function() {
     this.initializeData();
 
     this.rest();
 
     this.setupUnofficialNotice();
-}
+};
 
 /**
  * This function collects all information we now about the structure and
@@ -348,4 +346,4 @@ ManPageFilter.prototype.rest = function() {
     $('h1').after($('<div style="padding: 10px;></div>"').append(search_result_info));
 };
 
-(new ManPageFilter()).initialize();
+new ManPageFilter();
