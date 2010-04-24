@@ -37,6 +37,7 @@ var ManPageFilter = function() {
     $('h1').after(this.search_result_info);
 
     this.setupUnofficialNotice();
+    search_field.focus();
 };
 
 ManPageFilter.prototype.setupSearchResultInfo = function() {
