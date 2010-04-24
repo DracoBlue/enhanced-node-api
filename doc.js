@@ -7,6 +7,8 @@
  * of MIT.
  */
 var ManPageFilter = function() {
+    var self = this;
+    
     this.man_content_container = $('#man-content');
     this.filter_box_relative = $('#toctitle');
 
@@ -22,59 +24,39 @@ var ManPageFilter = function() {
 
     this.filter_box_relative.after(this.table_of_contents);
 
-    var search_result_info = this.setupSearchResultInfo();
-    var search_field = this.setupSearchField(search_result_info);
+    this.search_result_info = this.setupSearchResultInfo();
+    var search_field = this.setupSearchField();
 
+    this.filter_box_relative.after($('<button style="width: 22px; margin-left: 5px">X</button>').click(function() {
+        search_field.val('');
+        self.filterForText('');
+        search_field.focus();
+    }));
     this.filter_box_relative.after(search_field);
     this.filter_box_relative.after($('<div style="font-size: 70%">Filter:</div>'));
-    $('h1').after(search_result_info);
+    $('h1').after(this.search_result_info);
 
     this.setupUnofficialNotice();
 };
 
-ManPageFilter.prototype.setupSearchResultInfo = function(search_result_info) {
+ManPageFilter.prototype.setupSearchResultInfo = function() {
     return $('<div style="display: none; background-color: #121314; padding: 10px;" />');
 };
 
-ManPageFilter.prototype.setupSearchField = function(search_result_info) {
+ManPageFilter.prototype.setupSearchField = function() {
     var self = this;
 
-    var search_field = $('<input style="width: 160px; margin-bottom: 10px;" />');
+    var search_field = $('<input style="width: 140px; margin-bottom: 10px;" />');
 
-    var previous_text = "";
+    this.previous_text = "";
 
     var checkForSearchChangeHandler = function(event) {
         var text = search_field.val().toLowerCase();
-        if (previous_text === text) {
+        if (self.previous_text === text) {
             return;
         }
 
-        previous_text = text;
-
-        var u = new Date();
-
-        self.man_content_container.css('visibility', 'hidden');
-
-        var elements_found = 0;
-
-        if (text === '') {
-            elements_found = self.showAllElements();
-        } else {
-            elements_found = self.filterElements(text);
-        }
-
-        if (elements_found === self.elements.length) {
-            search_result_info.slideUp();
-        } else {
-            search_result_info.text([
-                'Filtered Results: Hiding ', Math.floor(10000 - elements_found * 10000 / self.elements.length) / 100, '% (took ',
-                ((new Date()).getTime() - u.getTime()), 'ms)'
-            ].join(''));
-
-            search_result_info.slideDown();
-        }
-
-        self.man_content_container.css('visibility', '');
+        self.filterForText(text);
     };
 
     var check_for_search_change_handler_timer = null;
@@ -89,6 +71,35 @@ ManPageFilter.prototype.setupSearchField = function(search_result_info) {
     search_field.keyup(delayedCheckForSearchChangeHandler).change(delayedCheckForSearchChangeHandler);
 
     return search_field;
+};
+
+ManPageFilter.prototype.filterForText = function(text) {
+    this.previous_text = text;
+    
+    var u = new Date();
+    
+    this.man_content_container.css('visibility', 'hidden');
+    
+    var elements_found = 0;
+    
+    if (text === '') {
+        elements_found = this.showAllElements();
+    } else {
+        elements_found = this.filterElements(text);
+    }
+    
+    if (elements_found === this.elements.length) {
+        this.search_result_info.slideUp();
+    } else {
+        this.search_result_info.text([
+            'Filtered Results: Hiding ', Math.floor(10000 - elements_found * 10000 / this.elements.length) / 100, '% (took ',
+            ((new Date()).getTime() - u.getTime()), 'ms)'
+        ].join(''));
+    
+        this.search_result_info.slideDown();
+    }
+    
+    this.man_content_container.css('visibility', '');
 };
 
 /**
