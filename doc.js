@@ -82,6 +82,14 @@ ManPageFilter.prototype.setupSearchField = function() {
     $(document).keydown(function(event) {
         if (event.keyCode === 70 && !search_field_has_focus) {
             search_field.focus();
+            
+            if (event.shiftKey) {
+                search_field.val('');
+                self.filterForText('');
+            } else {
+                search_field.select();
+            }
+            
             event.preventDefault();
             return false;
         }
