@@ -71,6 +71,22 @@ ManPageFilter.prototype.setupSearchField = function() {
 
     search_field.keyup(delayedCheckForSearchChangeHandler).change(delayedCheckForSearchChangeHandler);
 
+    var search_field_has_focus = false;
+    
+    search_field.focus(function() {
+        search_field_has_focus = true;
+    });
+    search_field.blur(function() {
+        search_field_has_focus = false;
+    });
+    $(document).keydown(function(event) {
+        if (event.keyCode === 70 && !search_field_has_focus) {
+            search_field.focus();
+            event.preventDefault();
+            return false;
+        }
+    });
+    
     return search_field;
 };
 
