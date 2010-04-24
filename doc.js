@@ -212,10 +212,10 @@ ManPageFilter.prototype.createNavigationNode = function(element) {
                 scrollTop: 0
             }, 500);
         } else {
-            var targetOffset = element.offset().top;
+            var targetOffset = element.offset().top + $('#man').scrollTop();
             $('#man').animate({
                 scrollTop: targetOffset
-            }, 500);
+            }, 200);
         }
         event.preventDefault();
         return true;
