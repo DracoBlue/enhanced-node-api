@@ -2,18 +2,129 @@ var ManPageFilter = function() {
     this.man_content_container = $('#man-content');
     this.filter_box_relative = $('#toctitle');
 
+    this.element_navigation_node = null;
+    this.elements = null;
+    this.element_search_texts = null;
+    
+    this.elements_first_header_index = null;
+
+    this.table_of_contents = null;
+
     this.initializeData();
 
-    this.rest();
+    this.filter_box_relative.after(this.table_of_contents);
 
+    this.setupSearchField();
     this.setupUnofficialNotice();
 };
 
+ManPageFilter.prototype.setupSearchField = function() {
+    var self = this;
+
+    var elements = this.elements;
+    var elements_length = elements.length;
+
+    var search_field = $('<input style="width: 160px; margin-bottom: 10px;" />');
+    var search_result_info = $('<div style="display: none; background-color: #121314; padding: 10px;"></div>');
+    var previous_text = "";
+
+    var checkForSearchChangeHandler = function(event) {
+        var text = search_field.val().toLowerCase();
+        if (previous_text === text) {
+            return;
+        }
+
+        previous_text = text;
+
+        var u = new Date();
+
+        self.man_content_container.css('visibility', 'hidden');
+
+        var elements_found = 0;
+
+        if (text === '') {
+            elements_found = self.showAllElements();
+        } else {
+            elements_found = self.filterElements(text);
+        }
+
+        if (elements_found === elements_length) {
+            search_result_info.slideUp();
+        } else {
+            search_result_info.text([
+                'Filtered Results: Hiding ', Math.floor(10000 - elements_found * 10000 / elements_length) / 100, '% (took ',
+                ((new Date()).getTime() - u.getTime()), 'ms)'
+            ].join(''));
+
+            search_result_info.slideDown();
+        }
+
+        self.man_content_container.css('visibility', '');
+    };
+
+    var check_for_search_change_handler_timer = null;
+
+    var delayedCheckForSearchChangeHandler = function() {
+        if (check_for_search_change_handler_timer) {
+            clearTimeout(check_for_search_change_handler_timer);
+        }
+        check_for_search_change_handler_timer = setTimeout(checkForSearchChangeHandler, 200);
+    };
+
+    search_field.keyup(delayedCheckForSearchChangeHandler).change(delayedCheckForSearchChangeHandler);
+
+    this.filter_box_relative.after(search_field);
+    this.filter_box_relative.after($('<div style="font-size: 70%">Filter:</div>'));
+
+    $('h1').after(search_result_info);
+};
+
 /**
- * This function collects all information we now about the structure and
- * contents of the man page. It also initializes the search index.
+ * Do not hide any elements in navigation nor in man content.
  */
-ManPageFilter.prototype.initializeData = function() {
+ManPageFilter.prototype.showAllElements = function() {
+    var elements = this.elements;
+    var elements_length = elements.length;
+    var element_navigation_node = this.element_navigation_node;
+
+    for ( var i = this.elements_first_header_index; i < elements_length; i++) {
+        element = elements[i];
+        element.style.display = '';
+        if (element_navigation_node[i] !== false) {
+            element_navigation_node[i].style.display = '';
+        }
+    }
+    return elements_length;
+};
+
+/**
+ * Show only those elements in man content, which fit to that filter. Hide also
+ * navigation nodes, which are not useful.
+ */
+ManPageFilter.prototype.filterElements = function(text) {
+    var elements = this.elements;
+    var elements_length = elements.length;
+    var element_navigation_node = this.element_navigation_node;
+    var element_search_texts = this.element_search_texts;
+    var elements_found = 0;
+
+    for ( var i = this.elements_first_header_index; i < elements_length; i++) {
+        element = elements[i];
+        if (element_search_texts[i].indexOf(text) === -1) {
+            element.style.display = 'none';
+            if (element_navigation_node[i] !== false) {
+                element_navigation_node[i].style.display = 'none';
+            }
+        } else {
+            element.style.display = '';
+            elements_found++;
+            if (element_navigation_node[i] !== false) {
+                element_navigation_node[i].style.display = '';
+            }
+        }
+    }
+
+    return elements_found;
 };
 
 /**
@@ -32,7 +143,8 @@ ManPageFilter.prototype.setupUnofficialNotice = function() {
 };
 
 /**
- * Take a given element (is either h2, h3 or h4) and create a navigation node for this element.
+ * Take a given element (is either h2, h3 or h4) and create a navigation node
+ * for this element.
  */
 ManPageFilter.prototype.createNavigationNode = function(element) {
     element = $(element);
@@ -42,7 +154,7 @@ ManPageFilter.prototype.createNavigationNode = function(element) {
 
     var new_navigaton_element_link = $('<a href="#' + element.attr('id') + '" />');
     new_navigaton_element_link.text(element.text().replace(/\(.*\)$/gi, ""));
-    
+
     new_navigaton_element_link.click(function(event) {
         /*
          * It's unknown, because invisible? Let's go to top!
@@ -60,9 +172,9 @@ ManPageFilter.prototype.createNavigationNode = function(element) {
         event.preventDefault();
         return true;
     });
-    
+
     new_navigation_element.append(new_navigaton_element_link);
-    
+
     return new_navigation_element[0];
 };
 
@@ -70,7 +182,7 @@ ManPageFilter.prototype.createNavigationNode = function(element) {
  * As soon as we notice that a specific navigation node with a parent is
  * reached, we create a expandable children navigation node and return it.
  */
-ManPageFilter.prototype.createExpandableChildrenNavigation = function(parent_navigation_node) {
+ManPageFilter.prototype.createSubNavigation = function(parent_navigation_node) {
     var children_node = $('<ul style="display: none" />');
     /**
      * The +/- button to toggle the parent's open/closed state.
@@ -89,16 +201,20 @@ ManPageFilter.prototype.createExpandableChildrenNavigation = function(parent_nav
         event.preventDefault();
         return false;
     });
-    
+
     parent_navigation_node.prepend(open_parent_node);
     parent_navigation_node.append(children_node);
 
     parent_navigation_node.removeClass('topLevel');
-    
+
     return children_node;
 };
 
-ManPageFilter.prototype.rest = function() {
+/**
+ * This function collects all information we now about the structure and
+ * contents of the man page. It also initializes the search index.
+ */
+ManPageFilter.prototype.initializeData = function() {
     var self = this;
 
     /*
@@ -118,6 +234,7 @@ ManPageFilter.prototype.rest = function() {
      * All children in the #man-element.
      */
     var elements = this.man_content_container.children();
+    this.elements = elements;
 
     /**
      * We'll store the length for performance reasons.
@@ -169,12 +286,13 @@ ManPageFilter.prototype.rest = function() {
      * The stack is like a breadcrumb for the current element.
      */
 
+    this.table_of_contents = $('<ul />')[0];
+
     /**
      * Stack contains the dom_element for the parent, which holds all children
      */
     var navigation_stack = [];
-    navigation_stack.push($('<ul />')[0]);
-
+    navigation_stack.push(this.table_of_contents);
     /**
      * Stack contains the search-text for the parents.
      */
@@ -194,12 +312,14 @@ ManPageFilter.prototype.rest = function() {
      * creation and finally a gets joined into a string).
      */
     var element_search_texts = {};
+    this.element_search_texts = element_search_texts;
 
     /**
      * A map, which contains the navigation node, which is connected with an
      * element.
      */
     var element_navigation_node = {};
+    this.element_navigation_node = element_navigation_node;
 
     /*
      * Let's fill all those maps with content now ...
@@ -216,6 +336,13 @@ ManPageFilter.prototype.rest = function() {
 
         if (typeof is_header_tag[tag_name] !== 'undefined') {
             new_level = Number(tag_name.substr(1, 1)) - 1;
+            
+            /*
+             * Let's remember where we started with headings, so we won't hide anything except the content.
+             */
+            if (this.elements_first_header_index === null) {
+                this.elements_first_header_index = i;
+            }
 
             if (new_level === level + 1) {
                 // we reached just a new level!
@@ -237,121 +364,60 @@ ManPageFilter.prototype.rest = function() {
                 level = new_level;
             }
 
-            if (new_level === level) {
-                element_navigation_node[i] = this.createNavigationNode(element);
+            /*
+             * Finally all depth issues are resolved, now let's create the node.
+             */
 
-                /*
-                 * Ok, we don't have that <ul> for the children, yet.
-                 */
-                if (navigation_stack[level - 1] === true) {
-                    navigation_stack[level - 1] = this.createExpandableChildrenNavigation($(element_navigation_node[navigation_parent_stack[level - 1]]));
-                }
-                $(navigation_stack[level - 1]).append(element_navigation_node[i]);
+            element_navigation_node[i] = this.createNavigationNode(element);
 
-                /*
-                 * We'll put true on the stack, and in case we add children,
-                 * we'll check for that
-                 */
-                navigation_stack.push(true);
-
-                navigation_text_stack.push(element_lowercase_text);
-                navigation_parent_stack.push(i);
-
-                element_search_texts[i].push(navigation_text_stack.join(' '));
+            /*
+             * Ok, we don't have that <ul> for the children, yet.
+             */
+            if (navigation_stack[level - 1] === true) {
+                navigation_stack[level - 1] = this.createSubNavigation($(element_navigation_node[navigation_parent_stack[level - 1]]));
             }
+            $(navigation_stack[level - 1]).append(element_navigation_node[i]);
+
+            /*
+             * We'll put true on the stack, and in case we add children, we'll
+             * check for that
+             */
+            navigation_stack.push(true);
+
+            navigation_text_stack.push(element_lowercase_text);
+
+            navigation_parent_stack.push(i);
         } else {
             element_navigation_node[i] = false;
         }
-        // great, "just" content!
+
+        /*
+         * Update the search index for the element and add the entire bread
+         * crumbs to it.
+         */
+        element_search_texts[i].push(navigation_text_stack.join(' '));
+
+        /*
+         * Now inject the element's content also as search value for most parent
+         * nodes (except root).
+         */
         var navigation_parent_stack_length = navigation_parent_stack.length;
         for ( var p = 1; p < navigation_parent_stack_length; p++) {
             element_search_texts[navigation_parent_stack[p]].push(element_lowercase_text);
         }
+
+        /*
+         * Update the search index text for the element to it's own text
+         */
         element_search_texts[i].push(element_lowercase_text);
-        element_search_texts[i].push(element_search_texts[navigation_parent_stack[navigation_parent_stack_length - 1]][0]);
     }
 
     /*
      * Now we have to join the element_search_texts.
      */
-    for ( var i = 0; i < elements_length; i++) {
-        element_search_texts[i] = element_search_texts[i].join(' ');
+    for ( var e = 0; e < elements_length; e++) {
+        element_search_texts[e] = element_search_texts[e].join(' ');
     }
-
-    var search_field = $('<input style="width: 160px; margin-bottom: 10px;" />');
-    var search_result_info = $('<div style="display: none; background-color: #121314; padding: 10px;"></div>');
-    var previous_text = "";
-
-    var checkForSearchChangeHandler = function(event) {
-        var text = search_field.val().toLowerCase();
-        if (previous_text === text) {
-            return;
-        }
-
-        previous_text = text;
-
-        var u = new Date();
-
-        self.man_content_container.css('visibility', 'hidden');
-
-        var elements_found = 0;
-
-        if (text === '') {
-            for ( var i = 0; i < elements_length; i++) {
-                element = elements[i];
-                element.style.display = '';
-                if (element_navigation_node[i] !== false) {
-                    element_navigation_node[i].style.display = '';
-                }
-            }
-            elements_found = elements_length;
-        } else {
-            for ( var i = 0; i < elements_length; i++) {
-                element = elements[i];
-                if (element_search_texts[i].indexOf(text) === -1) {
-                    element.style.display = 'none';
-                    if (element_navigation_node[i] !== false) {
-                        element_navigation_node[i].style.display = 'none';
-                    }
-                } else {
-                    element.style.display = '';
-                    elements_found++;
-                    if (element_navigation_node[i] !== false) {
-                        element_navigation_node[i].style.display = '';
-                    }
-                }
-            }
-        }
-
-        if (elements_found === elements_length) {
-            search_result_info.slideUp();
-        } else {
-            search_result_info.text([
-                'Filtered Results: Hiding ', Math.floor(10000 - elements_found * 10000 / elements_length) / 100, '% (took ',
-                ((new Date()).getTime() - u.getTime()), 'ms)'
-            ].join(''));
-            search_result_info.slideDown();
-        }
-
-        self.man_content_container.css('visibility', '');
-    };
-
-    var check_for_search_change_handler_timer = null;
-
-    var delayedCheckForSearchChangeHandler = function() {
-        if (check_for_search_change_handler_timer) {
-            clearTimeout(check_for_search_change_handler_timer);
-        }
-        check_for_search_change_handler_timer = setTimeout(checkForSearchChangeHandler, 200);
-    };
-
-    search_field.keyup(delayedCheckForSearchChangeHandler).change(delayedCheckForSearchChangeHandler);
-
-    this.filter_box_relative.after(navigation_stack[0]);
-    this.filter_box_relative.after(search_field);
-    this.filter_box_relative.after($('<div style="font-size: 70%">Filter:</div>'));
-
-    $('h1').after($('<div style="padding: 10px;></div>"').append(search_result_info));
 };
 
 new ManPageFilter();
