@@ -470,3 +470,8 @@ ManPageFilter.prototype.initializeData = function() {
 };
 
 new ManPageFilter();
+
+setTimeout(function()
+{
+    sh_highlightDocument();
+}, 100);
