@@ -1,303 +1,302 @@
 <!DOCTYPE html>
 <head> 
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name='generator' value='Ronn/v0.4.1'> 
-    <title>node(1) -- evented I/O for V8 JavaScript</title> 
-    <style type='text/css'> 
-        *{
-            margin: 0;padding: 0;
-        }
-        html,body
-        {
-            height: 100%;
-        }
-        body
-        {
-            font-family:helvetica, arial, sans serif;
-            background:#22252a;
-            color:#eee;
-            font-size:16px;
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name='generator' value='Ronn/v0.4.1'> 
+	<title>node(1) -- evented I/O for V8 JavaScript</title> 
+	<style type='text/css'> 
+		*{
+			margin: 0;padding: 0;
+		}
+		html,body
+		{
+			height: 100%;
+		}
+		body
+		{
+			font-family:helvetica, arial, sans serif;
+			background:#22252a;
+			color:#eee;
+			font-size:16px;
       line-height:1.3;
-            position:relative;
-            min-width: 690px;
-        }
-        a
-        {
-            color:#CD5;
-        }
-        a:focus
-        {
-            outline: none;
-            -moz-outline: none;
-        }
-        pre
-        {
-            overflow: hidden;
-        }
-        li
-        {
-            list-style: inside;
-        }
-        #man,#man code,#man pre,#man tt,#man kbd,#man samp
-        {
-            line-height:1.6;
-            color:#eee;
-            background:#22252a;
-        }
+			position:relative;
+			min-width: 690px;
+		}
+		a
+		{
+			color:#CD5;
+		}
+		a:focus
+		{
+			outline: none;
+			-moz-outline: none;
+		}
+		pre
+		{
+			overflow: hidden;
+		}
+		li
+		{
+			list-style: inside;
+		}
+		#man,#man code,#man pre,#man tt,#man kbd,#man samp
+		{
+			line-height:1.6;
+			color:#eee;
+			background:#22252a;
+		}
 
-        #man
-        {
-            margin: 0;
-            position: absolute;
-            top:0;
-            bottom:0;
-            left: 225px;
-            right: 0;
-            overflow: auto;
-        }
-        #man-content
-        {
-            padding: 0 20px;
-            max-width: 650px;
-        }
-        #man h1,#man h2,#man h3
-        {
-            color:#DCDDDE;
-            clear:left;     
-        }
+		#man
+		{
+			margin: 0;
+			position: absolute;
+			top:0;
+			bottom:0;
+			left: 225px;
+			right: 0;
+			overflow: auto;
+		}
+		#man-content
+		{
+			padding: 0 20px;
+			max-width: 650px;
+		}
+		#man h1,#man h2,#man h3
+		{
+			color:#DCDDDE;
+			clear:left;		
+		}
 
-        #man h1
-        {
-            background:url("http://nodejs.org/logo.png") no-repeat scroll center 0 transparent;
-            height:111px;
-            margin:15px 0 20px;
-            text-align:center;
-            text-indent:-2000px;
-        }
+		#man h1
+		{
+			background:url("http://nodejs.org/logo.png") no-repeat scroll center 0 transparent;
+			height:111px;
+			margin:15px 0 20px;
+			text-align:center;
+			text-indent:-2000px;
+		}
 
-        #man h2
-        {
-            font-size:18px;
-            background:#000;
-            color:#CD5;
-            margin:10px 0;
-            padding:5px 10px;
-        }
+		#man h2
+		{
+			font-size:18px;
+			background:#000;
+			color:#CD5;
+			margin:10px 0;
+			padding:5px 10px;
+		}
 
-        #man h3
-        {
-            font-size:16px;
-            margin:0 0 0 0ex;
-        }
+		#man h3
+		{
+			font-size:16px;
+			margin:0 0 0 0ex;
+		}
 
-        #man p,#man ul,#man ol,#man dl,#man pre
-        {
-            margin:0 0 18px;
-        }
+		#man p,#man ul,#man ol,#man dl,#man pre
+		{
+			margin:0 0 18px;
+		}
 
-        #man pre
-        {
-            color:#CCCDCE;
-            background:#121314;
-            border-left:2ex solid #222;
-            margin:0 0 20px;
-            padding:5px 7px;
-        }
+		#man pre
+		{
+			color:#CCCDCE;
+			background:#121314;
+			border-left:2ex solid #222;
+			margin:0 0 20px;
+			padding:5px 7px;
+		}
 
-        #man pre + h2,#man pre + h3
-        {
-            margin-top:22px;
-        }
+		#man pre + h2,#man pre + h3
+		{
+			margin-top:22px;
+		}
 
-        #man h2 + pre,#man h3 + pre
-        {
-            margin-top:5px;
-        }
+		#man h2 + pre,#man h3 + pre
+		{
+			margin-top:5px;
+		}
 
-        #man > p,#man > ul,#man > ol,#man > dl,#man > pre
-        {
-            margin-left:5%;
-        }
+		#man > p,#man > ul,#man > ol,#man > dl,#man > pre
+		{
+			margin-left:5%;
+		}
 
-        #man dt
-        {
-            clear:left;
-            margin:0;
-        }
+		#man dt
+		{
+			clear:left;
+			margin:0;
+		}
 
-        #man dt.flush
-        {
-            float:left;
-            width:8ex;
-        }
+		#man dt.flush
+		{
+			float:left;
+			width:8ex;
+		}
 
-        #man dd
-        {
-            margin:0 0 0 9ex;
-        }
+		#man dd
+		{
+			margin:0 0 0 9ex;
+		}
 
-        #man code,#man strong,#man b
-        {
-            font-weight:bold;
-            color:#ECEDEE;
-        }
+		#man code,#man strong,#man b
+		{
+			font-weight:bold;
+			color:#ECEDEE;
+		}
 
-        #man pre code
-        {
-            font-weight:normal;
-            color:#DCDDDE;
-            background:inherit;
-        }
+		#man pre code
+		{
+			font-weight:normal;
+			color:#DCDDDE;
+			background:inherit;
+		}
 
-        #man em,var,u
-        {
-            font-style:normal;
-            color:#CCCDCE;
-            border-bottom:1px solid #999;
-        }
+		#man em,var,u
+		{
+			font-style:normal;
+			color:#CCCDCE;
+			border-bottom:1px solid #999;
+		}
 
-        #man ol.man,#man ol.man li
-        {
-            float:left;
-            width:33%;
-            list-style-type:none;
-            text-transform:uppercase;
-            font-size:18px;
-            color:#666;
-            letter-spacing:1px;
-            margin:2px 0 10px;
-            padding:0;
-        }
+		#man ol.man,#man ol.man li
+		{
+			float:left;
+			width:33%;
+			list-style-type:none;
+			text-transform:uppercase;
+			font-size:18px;
+			color:#666;
+			letter-spacing:1px;
+			margin:2px 0 10px;
+			padding:0;
+		}
 
-        #man ol.man
-        {
-            width:100%;
-        }
+		#man ol.man
+		{
+			width:100%;
+		}
 
-        #man ol.man li.tl
-        {
-            text-align:left;
-        }
+		#man ol.man li.tl
+		{
+			text-align:left;
+		}
 
-        #man ol.man li.tc
-        {
-            text-align:center;
-            letter-spacing:4px;
-        }
+		#man ol.man li.tc
+		{
+			text-align:center;
+			letter-spacing:4px;
+		}
 
-        #man ol.man li.tr
-        {
-            text-align:right;
-        }
+		#man ol.man li.tr
+		{
+			text-align:right;
+		}
 
-        #man ol.man a
-        {
-            color:#666;
-        }
+		#man ol.man a
+		{
+			color:#666;
+		}
 
-        #man ol.man a:hover
-        {
-            color:#CCCDCE;
-        }
+		#man ol.man a:hover
+		{
+			color:#CCCDCE;
+		}
 
-        #toc
-        {
-            position: absolute;
-            top:0;
-            bottom:0;
-            left: 0;
-            padding-left: 30px;
-            width: 195px;
-            overflow: auto;
-            overflow-x: hidden;
-            font-size: 15px;
-        }
-        #toc li
-        {
-            text-wrap: word-wrap;
-        }
-        #toc a
-        {
-            display: inline-block;
-            width: 100%;
-            color: #fff;
-            text-decoration:none;
-        }
-        #toc > a:hover
-        {
-            color: rgba(255,255,255,0.7);
-        }
-        #toc > ul > li
-        {
-            border-bottom:1px solid #0f1214;
-            padding:5px 0 5px 5px;
-            list-style: none;
-            line-height: 1.3;
-        }
-        #toc ul ul
-        {
-            display: none;
-        }
-        #toc ul ul > li
-        {
-            border-top:1px solid rgba(0, 0, 0, 0.1);
-            color:#FFFFFF;
-            font-size:85%;
-            line-height:1.3;
-            list-style:disc outside none;
-            margin-left:25px;
-            max-width:165px;
-            padding:3px 0 5px 5px;
-        }
-        #toc li.active > a
-        {
-            color:#CD5;
-        }
+		#toc
+		{
+			position: absolute;
+			top:0;
+			bottom:0;
+			left: 0;
+			padding-left: 30px;
+			width: 195px;
+			overflow: auto;
+			overflow-x: hidden;
+			font-size: 15px;
+		}
+		#toc li
+		{
+			text-wrap: word-wrap;
+		}
+		#toc a
+		{
+			display: inline-block;
+			width: 100%;
+			color: #fff;
+			text-decoration:none;
+		}
+		#toc > a:hover
+		{
+			color: rgba(255,255,255,0.7);
+		}
+		#toc > ul > li
+		{
+			border-bottom:1px solid #0f1214;
+			padding:5px 0 5px 5px;
+			list-style: none;
+			line-height: 1.3;
+		}
+		#toc ul ul
+		{
+			display: none;
+		}
+		#toc ul ul > li
+		{
+			border-top:1px solid rgba(0, 0, 0, 0.1);
+			color:#FFFFFF;
+			font-size:85%;
+			line-height:1.3;
+			list-style:disc outside none;
+			margin-left:25px;
+			max-width:165px;
+			padding:3px 0 5px 5px;
+		}
+		#toc li.active > a
+		{
+			color:#CD5;
+		}
 
-        .sh_sourceCode
-        {
-            font-family: monospace;
-            overflow:hidden;
-        }
+		.sh_sourceCode
+		{
+			font-family: monospace;
+			overflow:hidden;
+		}
 
-        #toc .toggler
-        {
-            -moz-user-select:none;
-            background:none repeat scroll 0 0 #000000;
-            color:#FFFFFF;
-            display:inline-block;
-            font-weight:bold;
-            height:31px;
-            line-height:32px;
-            margin:-5px 8px -18px -33px;
-            outline:medium none;
-            padding:0;
-            text-align:center;
-            width:25px;
-        }
-        .current-section
-        {
-            position: fixed;
-            top: 0;
-            margin: 0 !important;
-        }
-        #toctitle
-        {
-            background:none repeat scroll 0 0 #000000;
-            color:#CCDD55;
-            font-size:18px;
-            margin: 0 0 10px -30px;
-            padding: 10px;
-        }
-    </style>
+		#toc .toggler
+		{
+			-moz-user-select:none;
+			background:none repeat scroll 0 0 #000000;
+			color:#FFFFFF;
+			display:inline-block;
+			font-weight:bold;
+			height:31px;
+			line-height:32px;
+			margin:-5px 8px -18px -33px;
+			outline:medium none;
+			padding:0;
+			text-align:center;
+			width:25px;
+		}
+		.current-section
+		{
+			position: fixed;
+			top: 0;
+			margin: 0 !important;
+		}
+		#toctitle
+		{
+			background:none repeat scroll 0 0 #000000;
+			color:#CCDD55;
+			font-size:18px;
+			margin: 0 0 10px -30px;
+			padding: 10px;
+		}
+	</style>
 <link rel="stylesheet" href="http://nodejs.org/sh_vim-dark.css" type="text/css" />
 </head>
 <body>
 
 <div id="toc">
-    <div id="toctitle">Node v0.1.92</div>
-
-    <noscript>JavaScript must be enabled in your browser to display the table of contents.</noscript>
+	<div id="toctitle">Node v0.1.95</div>
+	<noscript>JavaScript must be enabled in your browser to display the table of contents.</noscript>
 </div>
 <div id='man'>
 <div id="man-content">
@@ -308,7 +307,6 @@
 
   <li class='tc'></li>
   <li class='tr'>node(1)</li>
-
 </ol>
 <h2 id='NAME'>NAME</h2>
 <p><code>node</code> -- evented I/O for V8 JavaScript</p>
@@ -338,88 +336,96 @@ Server running at http://127.0.0.1:8000/
 
 <p>All of the examples in the documentation can be run similarly.</p>
 
-<h2 id="Modules">Modules</h2>
+<h2 id="Standard Modules">Standard Modules</h2>
 
-<p>Node uses the CommonJS module system.</p>
+<p>Node comes with a number of modules that are compiled in to the process,
+most of which are documented below.  The most common way to use these modules
+is with <code>require('name')</code> and then assigning the return value to a local
+variable with the same name as the module.</p>
 
-<p>Node has a simple module loading system.  In Node, files and modules are in
-one-to-one correspondence.  As an example, <code>foo.js</code> loads the module
-<code>circle.js</code> in the same directory.</p>
+<p>Example:</p>
 
-<p>The contents of <code>foo.js</code>:</p>
-
-<pre><code>var circle = require('./circle'),
-var sys = require('sys');
-sys.puts( 'The area of a circle of radius 4 is ' 
-        + circle.area(4));
+<pre><code>var sys = require('sys');
 </code></pre>
 
-<p>The contents of <code>circle.js</code>:</p>
-
-<pre><code>var PI = 3.14;
-
-exports.area = function (r) {
-  return PI * r * r;
-};
-
-exports.circumference = function (r) {
-  return 2 * PI * r;
-};
-</code></pre>
-
-<p>The module <code>circle.js</code> has exported the functions <code>area()</code> and
-<code>circumference()</code>.  To export an object, add to the special <code>exports</code>
-
-object.  (Alternatively, one can use <code>this</code> instead of <code>exports</code>.) Variables
-local to the module will be private. In this example the variable <code>PI</code> is
-private to <code>circle.js</code>. The function <code>puts()</code> comes from the module <code>'sys'</code>,
-which is a built-in module. Modules which are not prefixed by <code>'./'</code> are
-built-in module--more about this later.</p>
-
-<p>A module prefixed with <code>'./'</code> is relative to the file calling <code>require()</code>.
-That is, <code>circle.js</code> must be in the same directory as <code>foo.js</code> for
-<code>require('./circle')</code> to find it.</p>
-
-<p>Without the leading <code>'./'</code>, like <code>require('assert')</code> the module is searched
-for in the <code>require.paths</code> array. <code>require.paths</code> on my system looks like
-this:</p>
-
-<p><code>[ '/home/ryan/.node_libraries' ]</code></p>
-
-<p>That is, when <code>require('assert')</code> is called Node looks for:</p>
-
-<ul>
-<li>1: <code>/home/ryan/.node_libraries/assert.js</code></li>
-<li>2: <code>/home/ryan/.node_libraries/assert.node</code></li>
-<li>3: <code>/home/ryan/.node_libraries/assert/index.js</code></li>
-
-<li>4: <code>/home/ryan/.node_libraries/assert/index.node</code></li>
-</ul>
-
-
-<p>interrupting once a file is found. Files ending in <code>'.node'</code> are binary Addon
-Modules; see the section below about addons. <code>'index.js'</code> allows one to
-package a module as a directory.</p>
-
-<p><code>require.paths</code> can be modified at runtime by simply unshifting new
-paths onto it, or at startup with the <code>NODE_PATH</code> environmental
-variable (which should be a list of paths, colon separated).</p>
+<p>It is possible to extend node with other modules.  See <code>'Modules'</code></p>
 
 <h2 id="Buffers">Buffers</h2>
 
-<p>Pure Javascript is Unicode friendly but not nice to pure binary data.  When
+<p>Pure Javascript is Unicode friendly but not nice to binary data.  When
 dealing with TCP streams or the file system, it's necessary to handle octet
 streams. Node has several strategies for manipulating, creating, and
 consuming octet streams.</p>
 
 <p>Raw data is stored in instances of the <code>Buffer</code> class. A <code>Buffer</code> is similar
-to an array of integers but correspond to a raw memory allocation outside
+to an array of integers but corresponds to a raw memory allocation outside
 the V8 heap. A <code>Buffer</code> cannot be resized.
-Access the class at <code>require('buffer').Buffer</code>.</p>
+Access the class with <code>require('buffer').Buffer</code>.</p>
 
-<p>Node supports 3 string encodings. UTF-8 (<code>'utf8'</code>), ASCII (<code>'ascii'</code>), and
-Binary (<code>'binary'</code>). <code>'ascii'</code> and <code>'binary'</code> only look at the first 8 bits
-of the 16bit JavaScript string characters.</p>
+<p>Converting between Buffers and JavaScript string objects requires an explicit encoding
+method.  Node supports 3 string encodings: UTF-8 (<code>'utf8'</code>), ASCII (<code>'ascii'</code>), and
+Binary (<code>'binary'</code>).</p>
+
+<ul>
+<li><p><code>'ascii'</code> - for 7 bit ASCII data only.  This encoding method is very fast, and will
+strip the high bit if set.</p></li>
+<li><p><code>'binary'</code> - for 8 bit binary data such as images.</p></li>
+<li><p><code>'utf8'</code> - Unicode characters.  Many web pages and other document formats use UTF-8.</p></li>
+</ul>
+
+
+<h3>new Buffer(size)</h3>
+
+<p>Allocates a new buffer of <code>size</code> octets.</p>
+
+<h3>buffer.write(string, encoding, offset)</h3>
+
+<p>Writes <code>string</code> to the buffer at <code>offset</code> using the given encoding. Returns
+number of octets written.  If <code>buffer</code> did not contain enough space to fit
+the entire string it will write a partial amount of the string. In the case
+of <code>'utf8'</code> encoding, the method will not write partial characters.</p>
+
+<p>Example: write a utf8 string into a buffer, then print it</p>
+
+<pre><code>var sys = require('sys'),
+  Buffer = require('buffer').Buffer,
+  buf = new Buffer(256),
+  len;
+
+len = buf.write('\u00bd + \u00bc = \u00be', 'utf8', 0);
+sys.puts(len + " bytes: " + buf.toString('utf8', 0, len));
+
+// 12 bytes: ½ + ¼ = ¾
+</code></pre>
+
+<h3>buffer.toString(encoding, start, end)</h3>
+
+<p>Decodes and returns a string from buffer data encoded with <code>encoding</code>
+beginning at <code>start</code> and ending at <code>end</code>.</p>
+
+<p>See <code>buffer.write()</code> example, above.</p>
+
+<h3>buffer[index]</h3>
+
+<p>Get and set the octet at <code>index</code>. The values refer to individual bytes,
+so the legal range is between <code>0x00</code> and <code>0xFF</code> hex or <code>0</code> and <code>255</code>.</p>
+
+<p>Example: copy an ASCII string into a buffer, one byte at a time:</p>
+
+<pre><code>var sys = require('sys'),
+  Buffer = require('buffer').Buffer,
+  str = "node.js",
+  buf = new Buffer(str.length),
+  i;
+
+for (i = 0; i &lt; str.length ; i += 1) {
+  buf[i] = str.charCodeAt(i);
+}
+
+sys.puts(buf);
+
+// node.js
+</code></pre>
 
 <h3>Buffer.byteLength(string, encoding)</h3>
 
@@ -427,49 +433,88 @@ of the 16bit JavaScript string characters.</p>
 <code>String.prototype.length</code> since that returns the number of <em>characters</em> in a
 string.</p>
 
-<pre><code>// Takes in a UTF8 string, gives back a buffer
-function stringToBuffer(string) {
-  var buffer = new Buffer(Buffer.byteLength(string));
-  buffer.utf8Write(string);
-  return buffer;
-};
+<p>Example:</p>
+
+<pre><code>var sys = require('sys'),
+  Buffer = require('buffer').Buffer,
+  str = '\u00bd + \u00bc = \u00be';
+
+sys.puts(str + ": " + str.length + " characters, " + 
+  Buffer.byteLength(str, 'utf8') + " bytes");
+
+// ½ + ¼ = ¾: 9 characters, 12 bytes
 </code></pre>
-
-<h3>new Buffer(size)</h3>
-
-<p>Allocates a new buffer of <code>size</code> octets.</p>
-
-<h3>buffer[index]</h3>
-
-<p>Get and set the octet at <code>index</code>. The value can be between <code>0x00</code> and <code>0xFF</code>.</p>
 
 <h3>buffer.length</h3>
 
-<p>length in octets.</p>
+<p>The size of the buffer in bytes.  Note that this is not necessarily the size
+of the contents. <code>length</code> refers to the amount of memory allocated for the
+buffer object.  It does not change when the contents of the buffer are changed.</p>
 
-<h3>buffer.copy(targetBuffer, targetStart, start, end)</h3>
+<pre><code>var sys = require('sys'),
+  Buffer = require('buffer').Buffer,
+  buf = new Buffer(1234);
+
+sys.puts(buf.length);
+buf.write("some string", "ascii", 0);
+sys.puts(buf.length);
+
+// 1234
+// 1234
+</code></pre>
+
+<h3>buffer.copy(targetBuffer, targetStart, sourceStart, sourceEnd)</h3>
 
 <p>Does a memcpy() between buffers.</p>
+
+<p>Example: build two Buffers, then copy <code>buf1</code> from byte 16 through byte 20
+into <code>buf2</code>, starting at the 8th byte in <code>buf2</code>.</p>
+
+<pre><code>var sys = require('sys'),
+  Buffer = require('buffer').Buffer,
+  buf1 = new Buffer(26),
+  buf2 = new Buffer(26),
+  i;
+
+for (i = 0 ; i &lt; 26 ; i += 1) {
+  buf1[i] = i + 97; // 97 is ASCII a
+  buf2[i] = 33; // ASCII !
+}
+
+buf1.copy(buf2, 8, 16, 20);
+sys.puts(buf2.toString('ascii', 0, 25));
+
+// !!!!!!!!qrst!!!!!!!!!!!!!
+</code></pre>
 
 <h3>buffer.slice(start, end)</h3>
 
 <p>Returns a new buffer which references the
 same memory as the old, but offset and cropped by the <code>start</code> and <code>end</code>
+indexes.</p>
 
-indexes. <strong>Modifying the new buffer slice will modify memory in the original
-buffer!</strong></p>
+<p><strong>Modifying the new buffer slice will modify memory in the original buffer!</strong></p>
 
-<h3>buffer.write(string, encoding, offset)</h3>
+<p>Example: build a Buffer with the ASCII alphabet, take a slice, then modify one byte
+from the original Buffer.</p>
 
-<p>Writes <code>string</code> to the buffer at <code>offset</code> using the given encoding. Returns
-number of octets written.  If <code>buffer</code> did not contain enough space to fit
-the entire string it will write a partial amount of the string. In the case
-of <code>encoding=='utf8'</code>, the method will not write partial characters.</p>
+<pre><code>var sys = require('sys'),
+  Buffer = require('buffer').Buffer,
+  buf1 = new Buffer(26), buf2,
+  i;
 
-<h3>buffer.toString(encoding, start, end)</h3>
+for (i = 0 ; i &lt; 26 ; i += 1) {
+  buf1[i] = i + 97; // 97 is ASCII a
+}
 
-<p>Decodes and returns a string assuming in the given encoding beginning at
-<code>start</code> and ending at <code>end</code>.</p>
+buf2 = buf1.slice(0, 3);
+sys.puts(buf2.toString('ascii', 0, buf2.length));
+buf1[0] = 33;
+sys.puts(buf2.toString('ascii', 0, buf2.length));
+
+// abc
+// !bc
+</code></pre>
 
 <h2 id="EventEmitter">EventEmitter</h2>
 
@@ -488,11 +533,23 @@ is emitted. These functions are called <em>listeners</em>.</p>
 <p>All EventEmitters emit the event <code>'newListener'</code> when new listeners are
 added.</p>
 
+<p>When an EventEmitter experiences an error, the typical action is to emit an
+<code>'error'</code> event.  Error events are special--if there is no handler for them
+they will print a stack trace and exit the program.</p>
+
 <h3>Event: 'newListener'</h3>
 
 <p><code>function (event, listener) { }</code></p>
 
 <p>This event is made any time someone adds a new listener.</p>
+
+<h3>Event: 'error'</h3>
+
+<p><code>function (exception) { }</code></p>
+
+<p>If an error was encountered, then this event is emitted. This event is
+special - when there are no listeners to receive the error Node will
+terminate execution and display the exception's stack trace.</p>
 
 <h3>emitter.addListener(event, listener)</h3>
 
@@ -563,7 +620,6 @@ will emit this.  (For example, an incoming HTTP request will not emit
 <h3>stream.setEncoding(encoding)</h3>
 
 <p>Makes the data event emit a string instead of a <code>Buffer</code>. <code>encoding</code> can be
-
 <code>'utf8'</code>, <code>'ascii'</code>, or <code>'binary'</code>.</p>
 
 <h3>stream.pause()</h3>
@@ -593,7 +649,7 @@ indicate that it is safe to write again.</p>
 
 <p><code>function (exception) { }</code></p>
 
-<p>Emitted on error with the exception <code>e</code>.</p>
+<p>Emitted on error with the exception <code>exception</code>.</p>
 
 <h3>Event: 'close'</h3>
 
@@ -640,30 +696,48 @@ or FIN. This is useful to reduce the number of packets sent.</p>
 
 <h3>process</h3>
 
-<p>The process object. Most stuff lives in here. See the 'process object'
+<p>The process object. Most stuff lives in here. See the <code>'process object'</code>
 section.</p>
 
 <h3>require()</h3>
 
-<p>To require modules. See the modules section.</p>
+<p>To require modules. See the <code>'Modules'</code> section.</p>
 
 <h3>require.paths</h3>
 
-<p>The search path for absolute path arguments to <code>require()</code>.</p>
+<p>An array of search paths for <code>require()</code>.  This array can be modified to add custom paths.</p>
+
+<p>Example: add a new path to the beginning of the search list</p>
+
+<pre><code>var sys = require('sys');
+
+require.paths.unshift('/usr/local/node');
+sys.puts(require.paths);
+// /usr/local/node,/Users/mjr/.node_libraries
+</code></pre>
 
 <h3>__filename</h3>
 
-<p>The filename of the script being executed.</p>
+<p>The filename of the script being executed.  This is the absolute path, and not necessarily
+the same filename passed in as a command line argument.</p>
 
 <h3>__dirname</h3>
 
 <p>The dirname of the script being executed.</p>
 
+<p>Example: running <code>node example.js</code> from <code>/Users/mjr</code></p>
+
+<pre><code>var sys = require('sys');
+sys.puts(__filename);
+sys.puts(__dirname);
+// /Users/mjr/example.js
+// /Users/mjr
+</code></pre>
+
 <h3>module</h3>
 
 <p>A reference to the current module (of type <code>process.Module</code>). In particular
 <code>module.exports</code> is the same as the <code>exports</code> object. See <code>src/process.js</code>
-
 for more information.</p>
 
 <h2 id="process">process</h2>
@@ -713,7 +787,7 @@ setTimeout(function () {
 }, 500);
 
 // Intentionally cause an exception, but don't catch it.
-nonexistantFunc();
+nonexistentFunc();
 sys.puts('This will not run.');
 </code></pre>
 
@@ -816,7 +890,6 @@ catch (err) {
 
 <p>Similar to <code>eval</code> except that you can specify a <code>filename</code> for better
 error reporting and the <code>code</code> cannot see the local scope.  The value of <code>filename</code>
-
 will be used as a filename if a stack trace is generated by the compiled code.</p>
 
 <p>Example of using <code>process.compile</code> and <code>eval</code> to run the same code:</p>
@@ -835,7 +908,6 @@ sys.puts('localVar: ' + localVar + ', evaled: ' + evaled);
 </code></pre>
 
 <p><code>process.compile</code> does not have access to the local scope, so <code>localVar</code> is unchanged.
-
 <code>eval</code> does have access to the local scope, so <code>localVar</code> is changed.</p>
 
 <p>In case of syntax error in <code>code</code>, <code>process.compile</code> exits node.</p>
@@ -901,7 +973,7 @@ catch (err) {
 
 <p>A compiled-in property that exposes <code>NODE_PREFIX</code>.</p>
 
-<pre><code>require('sys').puts('Install prefix: ' + process.installPrefix);
+<pre><code>require('sys').puts('Prefix: ' + process.installPrefix);
 </code></pre>
 
 <h3>process.kill(pid, signal)</h3>
@@ -988,8 +1060,8 @@ given, otherwise returns the current mask.</p>
     oldmask, newmask = 0644;
 
 oldmask = process.umask(newmask);
-// these octal numbers don't display right in JavaScript
-sys.puts('Changed umask from: ' + oldmask + ' to ' + newmask);
+sys.puts('Changed umask from: ' + oldmask.toString(8) +
+         ' to ' + newmask.toString(8));
 </code></pre>
 
 <h2 id="sys">sys</h2>
@@ -999,14 +1071,14 @@ them.</p>
 
 <h3>sys.puts(string)</h3>
 
-<p>Outputs <code>string</code> and a trailing new-line to <code>stdout</code>.</p>
+<p>Outputs <code>string</code> and a trailing newline to <code>stdout</code>.</p>
 
 <pre><code>require('sys').puts('String with a newline');
 </code></pre>
 
 <h3>sys.print(string)</h3>
 
-<p>Like <code>puts()</code> but without the trailing new-line.</p>
+<p>Like <code>puts()</code> but without the trailing newline.</p>
 
 <pre><code>require('sys').print('String with no newline');
 </code></pre>
@@ -1051,7 +1123,6 @@ sys.puts(sys.inspect(sys, true, null));
 <h3>setTimeout(callback, delay, [arg, ...])</h3>
 
 <p>To schedule execution of <code>callback</code> after <code>delay</code> milliseconds. Returns a
-
 <code>timeoutId</code> for possible use with <code>clearTimeout()</code>.</p>
 
 <h3>clearTimeout(timeoutId)</h3>
@@ -1072,7 +1143,6 @@ Returns a <code>intervalId</code> for possible use with <code>clearInterval()</c
 <h2 id="Child Processes">Child Processes</h2>
 
 <p>Node provides a tri-directional <code>popen(3)</code> facility through the <code>ChildProcess</code>
-
 class.</p>
 
 <p>It is possible to stream data through the child's <code>stdin</code>, <code>stdout</code>, and
@@ -1087,11 +1157,17 @@ class.</p>
 
 <h3>Event:  'exit'</h3>
 
-<p><code>function (code) {}</code></p>
+<p><code>function (code, signal) {}</code></p>
 
-<p>This event is emitted after the child process ends. <code>code</code> is the final exit
-code of the process.  After this event is emitted, the <code>'output'</code> and
-<code>'error'</code> callbacks will no longer be made.</p>
+<p>This event is emitted after the child process ends. If the process terminated
+normally, <code>code</code> is the final exit code of the process, otherwise <code>null</code>. If
+the process terminated due to receipt of a signal, <code>signal</code> is the string name
+of the signal, otherwise <code>null</code>.</p>
+
+<p>After this event is emitted, the <code>'output'</code> and <code>'error'</code> callbacks will no
+longer be made.</p>
+
+<p>See <code>waitpid(2)</code>.</p>
 
 <h3>child_process.spawn(command, args, env)</h3>
 
@@ -1142,8 +1218,8 @@ be sent <code>'SIGTERM'</code>. See <code>signal(7)</code> for a list of availab
     spawn = require('child_process').spawn,
     grep  = spawn('grep', ['ssh']);
 
-grep.addListener('exit', function (code) {
-  sys.puts('child process exited with code ' + code);
+grep.addListener('exit', function (code, signal) {
+  sys.puts('child process terminated due to receipt of signal '+signal);
 });
 
 // send SIGHUP to process
@@ -1238,19 +1314,20 @@ output, and return it all in a callback.</p>
     exec  = require('child_process').exec,
     child;
 
-child = exec('cat *.js bad_file | wc -l', function (error, stdout, stderr) {
-  sys.print('stdout: ' + stdout);
-  sys.print('stderr: ' + stderr);
-  if (error !== null) {
-    sys.puts('exec error: ' + error);
-  }
-});
+child = exec('cat *.js bad_file | wc -l', 
+  function (error, stdout, stderr) {
+    sys.print('stdout: ' + stdout);
+    sys.print('stderr: ' + stderr);
+    if (error !== null) {
+      sys.puts('exec error: ' + error);
+    }
+  });
 </code></pre>
 
 <p>The callback gets the arguments <code>(error, stdout, stderr)</code>. On success, <code>error</code>
 will be <code>null</code>.  On error, <code>error</code> will be an instance of <code>Error</code> and <code>err.code</code>
-
-will be the exit code of the child process.</p>
+will be the exit code of the child process, and <code>err.signal</code> will be set to the
+signal that terminated the process.</p>
 
 <p>There is a second optional argument to specify several options. The default options are</p>
 
@@ -1269,12 +1346,14 @@ the child process is killed.</p>
 
 <h2 id="Script">Script</h2>
 
-<p><code>Script</code> class provides with compiling, remembering and running pieces of Javascript code. You can get <code>Script</code> class by issuing</p>
+<p><code>Script</code> class compiles and runs JavaScript code. You can access this class with:</p>
 
 <pre><code>var Script = process.binding('evals').Script;
 </code></pre>
 
-<h3>Script.runInThisContext(code, filename='evalmachine.<var> anonymous </var>')</h3>
+<p>New JavaScript code can be compiled and run immediately or compiled, saved, and run later.</p>
+
+<h3>Script.runInThisContext(code, filename)</h3>
 
 <p>Similar to <code>process.compile</code>.  <code>Script.runInThisContext</code> compiles <code>code</code> as if it were loaded from <code>filename</code>,
 runs it and returns the result. Running code does not have access to local scope. <code>filename</code> is optional.</p>
@@ -1283,108 +1362,127 @@ runs it and returns the result. Running code does not have access to local scope
 
 <pre><code>var sys = require('sys'),
     localVar = 123,
-    usingscript, evaled;
+    usingscript, evaled,
+    Script = process.binding('evals').Script;
 
-usingscript = Script.runInThisContext('localVar = 1;', 'myfile.js');
-sys.puts('localVar: ' + localVar + ', usingscript: ' + usingscript);
+usingscript = Script.runInThisContext('localVar = 1;',
+  'myfile.js');
+sys.puts('localVar: ' + localVar + ', usingscript: ' +
+  usingscript);
 evaled = eval('localVar = 1;');
-sys.puts('localVar: ' + localVar + ', evaled: ' + evaled);
+sys.puts('localVar: ' + localVar + ', evaled: ' +
+  evaled);
 
 // localVar: 123, usingscript: 1
 // localVar: 1, evaled: 1
 </code></pre>
 
 <p><code>Script.runInThisContext</code> does not have access to the local scope, so <code>localVar</code> is unchanged.
-
 <code>eval</code> does have access to the local scope, so <code>localVar</code> is changed.</p>
 
 <p>In case of syntax error in <code>code</code>, <code>Script.runInThisContext</code> emits the syntax error to stderr
 and throws.an exception.</p>
 
-<h3>Script.runInNewContext(code, sandbox={}, filename='evalmachine.<var> anonymous </var>')</h3>
+<h3>Script.runInNewContext(code, sandbox, filename)</h3>
 
 <p><code>Script.runInNewContext</code> compiles <code>code</code> to run in <code>sandbox</code> as if it were loaded from <code>filename</code>,
 then runs it and returns the result. Running code does not have access to local scope and
 the object <code>sandbox</code> will be used as the global object for <code>code</code>.
-
 <code>sandbox</code> and <code>filename</code> are optional.</p>
 
+<p>Example: compile and execute code that increments a global variable and sets a new one.
+These globals are contained in the sandbox.</p>
+
 <pre><code>var sys = require('sys'),
+    Script = process.binding('evals').Script,
     sandbox = {
       animal: 'cat',
       count: 2
     };
 
-Script.runInNewContext('count += 1; name = 'kitty'', sandbox, 'myfile.js');
+Script.runInNewContext(
+  'count += 1; name = "kitty"', sandbox, 'myfile.js');
 sys.puts(sys.inspect(sandbox));
+
+// { animal: 'cat', count: 3, name: 'kitty' }
 </code></pre>
 
 <p>Note that running untrusted code is a tricky business requiring great care.  To prevent accidental
-global variable leakage, <code>Script.runInNewContext</code> is quite useful, but to safely run untrusted code, many more steps
-must be taken.</p>
+global variable leakage, <code>Script.runInNewContext</code> is quite useful, but safely running untrusted code
+requires a separate process.</p>
 
 <p>In case of syntax error in <code>code</code>, <code>Script.runInThisContext</code> emits the syntax error to stderr
-and throws.an exception.</p>
+and throws an exception.</p>
 
-<h3>new Script(code, filename='evalmachine.<var> anonymous </var>')</h3>
+<h3>new Script(code, filename)</h3>
 
 <p><code>new Script</code> compiles <code>code</code> as if it were loaded from <code>filename</code>,
-but does not run it. Instead, it returns Script object representing this compiled code.
+but does not run it. Instead, it returns a <code>Script</code> object representing this compiled code.
 This script can be run later many times using methods below.
-The returned script is not bound to any global object,
-it is bound before each run, just for that run. <code>filename</code> is optional.</p>
+The returned script is not bound to any global object.
+It is bound before each run, just for that run. <code>filename</code> is optional.</p>
 
 <p>In case of syntax error in <code>code</code>, <code>new Script</code> emits the syntax error to stderr
-and throws.an exception.</p>
+and throws an exception.</p>
 
 <h3>script.runInThisContext()</h3>
 
-<p>Similar to "static" version in <code>Script.runInThisContext</code>, but now being a method of precompiled Script object.
-<code>script.runInThisContext</code> runs the code of <code>script</code> and returns the result. Running code does not have access to local scope
-and is run for actual <code>global</code> object (v8: in actual context).</p>
+<p>Similar to <code>Script.runInThisContext</code> (note capital 'S'), but now being a method of a precompiled Script object.
+<code>script.runInThisContext</code> runs the code of <code>script</code> and returns the result.
+Running code does not have access to local scope, but does have access to the <code>global</code> object
+(v8: in actual context).</p>
 
-<p>Example of using <code>script.runInThisContext</code> and <code>eval</code> to run the same code:</p>
+<p>Example of using <code>script.runInThisContext</code> to compile code once and run it multiple times:</p>
 
 <pre><code>var sys = require('sys'),
-    localVar = 123,
-    script, usingscript, evaled;
+    Script = process.binding('evals').Script,
+    scriptObj, i;
 
-script = new Script('localVar = 1', 'myfile.js');
-usingscript = script.runInThisContext();
-sys.puts('localVar: ' + localVar + ', usingscript: ' + usingscript);
-evaled = eval('localVar = 1;');
-sys.puts('localVar: ' + localVar + ', evaled: ' + evaled);
+globalVar = 0;
 
-// localVar: 123, usingscript: 1
-// localVar: 1, evaled: 1
+scriptObj = new Script('globalVar += 1', 'myfile.js');
+
+for (i = 0; i &lt; 1000 ; i += 1) {
+  scriptObj.runInThisContext();
+}
+
+sys.puts(globalVar);
+
+// 1000
 </code></pre>
 
-<p><code>script.runInThisContext</code> does not have access to the local scope, so <code>localVar</code> is unchanged.
+<h3>script.runInNewContext(sandbox)</h3>
 
-<code>eval</code> does have access to the local scope, so <code>localVar</code> is changed.</p>
+<p>Similar to <code>Script.runInNewContext</code> (note capital 'S'), but now being a method of a precompiled Script object.
+<code>script.runInNewContext</code> runs the code of <code>script</code> with <code>sandbox</code> as the global object and returns the result.
+Running code does not have access to local scope. <code>sandbox</code> is optional.</p>
 
-<h3>script.runInNewContext(sandbox={})</h3>
-
-<p>Similar to "static" version in <code>Script.runInNewContext</code>, but now being a method of precompiled Script object.
-<code>script.runInNewContext</code> runs the code of <code>script</code> in a <code>sandbox</code> and returns the result.
-Running code does not have access to local scope and the object <code>sandbox</code> will be used as the global object for the code.
-
-<code>sandbox</code>is optional.</p>
+<p>Example: compile code that increments a global variable and sets one, then execute this code multiple times.
+These globals are contained in the sandbox.</p>
 
 <pre><code>var sys = require('sys'),
-    script = new Script('count += 1; name = 'kitty'', 'myfile.js'),
+    Script = process.binding('evals').Script,
+    scriptObj, i,
     sandbox = {
       animal: 'cat',
       count: 2
     };
 
-script.runInNewContext(sandbox);
+scriptObj = new Script(
+    'count += 1; name = "kitty"', 'myfile.js');
+
+for (i = 0; i &lt; 10 ; i += 1) {
+  scriptObj.runInNewContext(sandbox);
+}
+
 sys.puts(sys.inspect(sandbox));
+
+// { animal: 'cat', count: 12, name: 'kitty' }
 </code></pre>
 
 <p>Note that running untrusted code is a tricky business requiring great care.  To prevent accidental
-global variable leakage, <code>Script.runInNewContext</code> is quite useful, but to safely run untrusted code, many more steps
-must be taken.</p>
+global variable leakage, <code>script.runInNewContext</code> is quite useful, but safely running untrusted code
+requires a separate process.</p>
 
 <h2 id="File System">File System</h2>
 
@@ -1470,9 +1568,9 @@ the entire process until they complete--halting all connections.</p>
 
 <p>Synchronous chmod(2).</p>
 
-<h3>fs.stat(path, callback), fs.lstat(path, callback)</h3>
+<h3>fs.stat(path, callback), fs.lstat(path, callback), fs.fstat(fd, callback)</h3>
 
-<p>Asynchronous stat(2) or lstat(2). The callback gets two arguments <code>(err, stats)</code> where <code>stats</code> is a <code>fs.Stats</code> object. It looks like this:</p>
+<p>Asynchronous stat(2), lstat(2) or fstat(2). The callback gets two arguments <code>(err, stats)</code> where <code>stats</code> is a <code>fs.Stats</code> object. It looks like this:</p>
 
 <pre><code>{ dev: 2049
 , ino: 305352
@@ -1492,9 +1590,9 @@ the entire process until they complete--halting all connections.</p>
 
 <p>See the <code>fs.Stats</code> section below for more information.</p>
 
-<h3>fs.statSync(path), fs.lstatSync(path)</h3>
+<h3>fs.statSync(path), fs.lstatSync(path), fs.fstatSync(fd)</h3>
 
-<p>Synchronous stat(2) or lstat(2). Returns an instance of <code>fs.Stats</code>.</p>
+<p>Synchronous stat(2), lstat(2) or fstat(2). Returns an instance of <code>fs.Stats</code>.</p>
 
 <h3>fs.link(srcpath, dstpath, callback)</h3>
 
@@ -1609,7 +1707,7 @@ is a string--what was read--and <code>bytesRead</code> is the number of bytes re
 
 <p>Synchronous version of <code>fs.read</code>. Returns an array <code>[data, bytesRead]</code>.</p>
 
-<h3>fs.readFile(filename, encoding='utf8', callback)</h3>
+<h3>fs.readFile(filename, [encoding,] callback)</h3>
 
 <p>Asynchronously reads the entire contents of a file. Example:</p>
 
@@ -1622,6 +1720,8 @@ is a string--what was read--and <code>bytesRead</code> is the number of bytes re
 <p>The callback is passed two arguments <code>(err, data)</code>, where <code>data</code> is the
 contents of the file.</p>
 
+<p>If no encoding is specified, then the raw buffer is returned.</p>
+
 <h3>fs.readFileSync(filename, encoding='utf8')</h3>
 
 <p>Synchronous version of <code>fs.readFile</code>. Returns the contents of the <code>filename</code>.</p>
@@ -1632,7 +1732,7 @@ contents of the file.</p>
 
 <pre><code>fs.writeFile('message.txt', 'Hello Node', function (err) {
   if (err) throw err;
-  sys.puts('It's saved!');
+  sys.puts('It\'s saved!');
 });
 </code></pre>
 
@@ -1671,7 +1771,6 @@ stat object:</p>
 <ul>
 <li><code>stats.isFile()</code></li>
 <li><code>stats.isDirectory()</code></li>
-
 <li><code>stats.isBlockDevice()</code></li>
 <li><code>stats.isCharacterDevice()</code></li>
 <li><code>stats.isSymbolicLink()</code></li>
@@ -1680,13 +1779,13 @@ stat object:</p>
 </ul>
 
 
-<h2 id="fs.FileReadStream">fs.FileReadStream</h2>
+<h2 id="fs.ReadStream">fs.ReadStream</h2>
 
-<p><code>FileReadStream</code> is a readable stream.</p>
+<p><code>ReadStream</code> is a readable stream.</p>
 
 <h3>fs.createReadStream(path, [options])</h3>
 
-<p>Returns a new FileReadStream object.</p>
+<p>Returns a new ReadStream object.</p>
 
 <p><code>options</code> is an object with the following defaults:</p>
 
@@ -1700,7 +1799,7 @@ stat object:</p>
 <h3>readStream.readable</h3>
 
 <p>A boolean that is <code>true</code> by default, but turns <code>false</code> after an <code>'error'</code>
-occured, the stream came to an 'end', or <code>destroy()</code> was called.</p>
+occured, the stream came to an <code>'end'</code>, or <code>destroy()</code> was called.</p>
 
 <h3>readStream.pause()</h3>
 
@@ -1716,13 +1815,13 @@ until the stream is resumed.</p>
 <p>Allows to close the stream before the <code>'end'</code> is reached. No more events other
 than <code>'close'</code> will be fired after this method has been called.</p>
 
-<h2 id="fs.FileWriteStream">fs.FileWriteStream</h2>
+<h2 id="fs.WriteStream">fs.WriteStream</h2>
 
-<p><code>FileWriteStream</code> is a writable stream.</p>
+<p><code>WriteStream</code> is a writable stream.</p>
 
 <h3>fs.createWriteStream(path, [options])</h3>
 
-<p>Returns a new FileWriteStream object.
+<p>Returns a new WriteStream object.
 <code>options</code> is an object with the following defaults:</p>
 
 <pre><code>{ 'flags': 'w'
@@ -1734,17 +1833,15 @@ than <code>'close'</code> will be fired after this method has been called.</p>
 <h3>writeStream.writeable</h3>
 
 <p>A boolean that is <code>true</code> by default, but turns <code>false</code> after an <code>'error'</code>
-
 occurred or <code>end()</code> / <code>destroy()</code> was called.</p>
 
-<h3>writeStream.write(data)</h3>
+<h3>writeStream.write(data, encoding='utf8')</h3>
 
 <p>Returns <code>true</code> if the data was flushed to the kernel, and <code>false</code> if it was
 queued up for being written later. A <code>'drain'</code> will fire after all queued data
 has been written.</p>
 
-<p>You can also specify <code>callback</code> to be notified when the data from this write
-has been flushed. The first param is <code>err</code>, the second is <code>bytesWritten</code>.</p>
+<p>The second optional parameter specifies the encoding of for the string.</p>
 
 <h3>writeStream.end()</h3>
 
@@ -1780,6 +1877,8 @@ HTTP API is very low-level. It deals with stream handling and message
 parsing only. It parses a message into headers and body but it does not
 parse the actual headers or the body.</p>
 
+<p>HTTPS is supported if OpenSSL is available on the underlying platform.</p>
+
 <h2 id="http.Server">http.Server</h2>
 
 <p>This is an EventEmitter with the following events:</p>
@@ -1806,7 +1905,7 @@ parse the actual headers or the body.</p>
 
 <p> Emitted when the server closes.</p>
 
-<h3>http.createServer(request_listener, [options])</h3>
+<h3>http.createServer(requestListener, [options])</h3>
 
 <p>Returns a new web server object.</p>
 
@@ -1814,8 +1913,40 @@ parse the actual headers or the body.</p>
 <code>options</code> argument accepts the same values as the
 options argument for <code>net.Server</code>.</p>
 
-<p>The <code>request_listener</code> is a function which is automatically
+<p>The <code>requestListener</code> is a function which is automatically
 added to the <code>'request'</code> event.</p>
+
+<h3>Event: 'request'</h3>
+
+<p><code>function (request, response) {}</code></p>
+
+<p>Emitted each time there is request. Note that there may be multiple requests
+per connection (in the case of keep-alive connections).</p>
+
+<h3>Event: 'upgrade'</h3>
+
+<p><code>function (request, socket, head)</code></p>
+
+<p>Emitted each time a client requests a http upgrade. If this event isn't
+listened for, then clients requesting an upgrade will have their connections
+closed.</p>
+
+<ul>
+<li><code>request</code> is the arguments for the http request, as it is in the request event.</li>
+<li><code>socket</code> is the network socket between the server and client.</li>
+<li><code>head</code> is an instance of Buffer, the first packet of the upgraded stream, this may be empty.</li>
+</ul>
+
+
+<p>After this event is emitted, the request's socket will not have a <code>data</code>
+event listener, meaning you will need to bind to it in order to handle data
+sent to the server on that socket.</p>
+
+<h3>Event: 'clientError'</h3>
+
+<p><code>function (exception) {}</code></p>
+
+<p>If a client connection emits an 'error' event - it will forwarded here.</p>
 
 <h3>server.listen(port, hostname)</h3>
 
@@ -1836,6 +1967,12 @@ is ready to accept connections.</p>
 This function is asynchronous. <code>listening</code> will be emitted when the server
 is ready to accept connections.</p>
 
+<h3>server.setSecure(credentials)</h3>
+
+<p>Enables HTTPS support for the server, with the crypto module credentials specifying the private key and certificate of the server, and optionally the CA certificates for use in client authentication.</p>
+
+<p>If the credentials hold one or more CA certificates, then the server will request for the client to submit a client certificate as part of the HTTPS connection handshake. The validity and content of this can be accessed via verifyPeer() and getPeerCertificate() from the server's request.connection.</p>
+
 <h3>server.close()</h3>
 
 <p>Stops the server from accepting new connections.</p>
@@ -1847,21 +1984,23 @@ the user--and passed as the first argument to a <code>'request'</code> listener.
 
 <p>This is an EventEmitter with the following events:</p>
 
-<dl>
-<dt><strong><code>'data'</code></strong> - <code>callback(chunk)</code></dt><dd>Emitted when a piece of the message body is received.</dd>
+<h3>Event: 'data'</h3>
 
-</dl>
+<p><code>function (chunk) { }</code></p>
 
+<p>Emitted when a piece of the message body is received.</p>
 
 <p>Example: A chunk of the body is given as the single
 argument. The transfer-encoding has been decoded.  The
 body chunk is a string.  The body encoding is set with
 <code>request.setBodyEncoding()</code>.</p>
 
-<dl>
-<dt><strong><code>'end'</code></strong> - <code>callback()</code></dt><dd>Emitted exactly once for each message. No arguments.  After
-emitted no other events will be emitted on the request.</dd>
-</dl>
+<h3>Event: 'end'</h3>
+
+<p><code>function () { }</code></p>
+
+<p>Emitted exactly once for each message. No arguments.  After
+emitted no other events will be emitted on the request.</p>
 
 <h3>request.method</h3>
 
@@ -1904,7 +2043,6 @@ you can use the <code>require('querystring').parse</code> function, or pass
 , query: { name: 'ryan' }
 , pathname: '/status'
 }
-
 </code></pre>
 
 <h3>request.headers</h3>
@@ -1916,7 +2054,6 @@ you can use the <code>require('querystring').parse</code> function, or pass
 <p>The HTTP protocol version as a string. Read only. Examples:
 <code>'1.1'</code>, <code>'1.0'</code>.
 Also <code>request.httpVersionMajor</code> is the first integer and
-
 <code>request.httpVersionMinor</code> is the second.</p>
 
 <h3>request.setEncoding(encoding='binary')</h3>
@@ -1935,6 +2072,8 @@ to <code>'binary'</code>.</p>
 <h3>request.connection</h3>
 
 <p>The <code>net.Stream</code> object assocated with the connection.</p>
+
+<p>With HTTPS support, use request.connection.verifyPeer() and request.connection.getPeerCertificate() to obtain the client's authentication details.</p>
 
 <h2 id="http.ServerResponse">http.ServerResponse</h2>
 
@@ -1975,7 +2114,6 @@ higher-level multi-part body encodings that may be used.</p>
 
 <p>The first time <code>response.write()</code> is called, it will send the buffered
 header information and the first body to the client. The second time
-
 <code>response.write()</code> is called, Node assumes you're going to be streaming
 data, and sends that separately. That is, the response is buffered up to the
 first chunk of body.</p>
@@ -2000,7 +2138,8 @@ stream. <em>Currently the implementation does not pipeline requests.</em></p>
 <pre><code>var sys = require('sys'),
    http = require('http');
 var google = http.createClient(80, 'www.google.com');
-var request = google.request('GET', '/', {'host': 'www.google.com'});
+var request = google.request('GET', '/',
+  {'host': 'www.google.com'});
 request.addListener('response', function (response) {
   sys.puts('STATUS: ' + response.statusCode);
   sys.puts('HEADERS: ' + JSON.stringify(response.headers));
@@ -2012,11 +2151,15 @@ request.addListener('response', function (response) {
 request.end();
 </code></pre>
 
-<h3>http.createClient(port, host)</h3>
+<h3>http.createClient(port, host, secure, credentials)</h3>
 
 <p>Constructs a new HTTP client. <code>port</code> and
 <code>host</code> refer to the server to be connected to. A
 stream is not established until a request is issued.</p>
+
+<p><code>secure</code> is an optional boolean flag to enable https support and <code>credentials</code> is an optional credentials object from the crypto module, which may hold the client's private key, certificate, and a list of trusted CA certificates.</p>
+
+<p>If the connection is secure, but no explicit CA certificates are passed in the credentials, then node.js will default to the publicly trusted list of CA certificates, as given in http://mxr.mozilla.org/mozilla/source/security/nss/lib/ckfw/builtins/certdata.txt</p>
 
 <h3>client.request([method], path, [request_headers])</h3>
 
@@ -2037,6 +2180,14 @@ the request. One needs to call <code>request.end()</code> to finalize the reques
 retrieve the response.  (This sounds convoluted but it provides a chance for
 the user to stream a body to the server with <code>request.write()</code>.)</p>
 
+<h3>client.verifyPeer()</h3>
+
+<p>Returns true or false depending on the validity of the server's certificate in the context of the defined or default list of trusted CA certificates.</p>
+
+<h3>client.getPeerCertificate()</h3>
+
+<p>Returns a JSON structure detailing the server's certificate, containing a dictionary with keys for the certificate 'subject', 'issuer', 'valid_from' and 'valid_to'</p>
+
 <h2 id="http.ClientRequest">http.ClientRequest</h2>
 
 <p>This object is created internally and returned from the <code>request()</code> method
@@ -2044,7 +2195,6 @@ of a <code>http.Client</code>. It represents an <em>in-progress</em> request who
 already been sent.</p>
 
 <p>To get the response, add a listener for <code>'response'</code> to the request object.
-
 <code>'response'</code> will be emitted from the request object when the response
 headers have been received.  The <code>'response'</code> event is executed with one
 argument which is an instance of <code>http.ClientResponse</code>.</p>
@@ -2054,7 +2204,6 @@ response object; particularly to listen for the <code>'data'</code> event. Note 
 the <code>'response'</code> event is called before any part of the response body is received,
 so there is no need to worry about racing to catch the first part of the
 body. As long as a listener for <code>'data'</code> is added during the <code>'response'</code>
-
 event, the entire body will be caught.</p>
 
 <pre><code>// Good
@@ -2077,12 +2226,12 @@ request.addListener('response', function (response) {
 <p>This is a writable stream.
 This is an <code>EventEmitter</code> with the following events:</p>
 
-<dl>
-<dt><strong><code>'response'</code></strong> - <code>callback(response)</code></dt><dd>Emitted when a response is received to this request. This event is emitted only once. The
+<h3>Event 'response'</h3>
 
-<code>response</code> argument will be an instance of <code>http.ClientResponse</code>.</dd>
-</dl>
+<p><code>function (response) { }</code></p>
 
+<p>Emitted when a response is received to this request. This event is emitted only once. The
+<code>response</code> argument will be an instance of <code>http.ClientResponse</code>.</p>
 
 <h3>request.write(chunk, encoding='ascii')</h3>
 
@@ -2098,7 +2247,6 @@ or a string.</p>
 <p>The <code>encoding</code> argument is optional and only
 applies when <code>chunk</code> is a string. The encoding
 argument should be either <code>'utf8'</code> or
-
 <code>'ascii'</code>. By default the body uses ASCII encoding,
 as it is faster.</p>
 
@@ -2125,7 +2273,6 @@ passed to the <code>'response'</code> event of the request object.</p>
 argument. The transfer-encoding has been decoded.  The
 body chunk a String.  The body encoding is set with
 `response.setBodyEncoding()`.
-
 </code></pre>
 
 <h3>Event: 'end'</h3>
@@ -2256,6 +2403,12 @@ and passed to the user through the <code>'connection'</code> event of a server.<
 <p>Emitted when a stream connection successfully is established.
 See <code>connect()</code>.</p>
 
+<h3>Event: 'secure'</h3>
+
+<p><code>function () { }</code></p>
+
+<p>Emitted when a stream connection successfully establishes a HTTPS handshake with its peer.</p>
+
 <h3>Event: 'data'</h3>
 
 <p><code>function (data) { }</code></p>
@@ -2276,8 +2429,10 @@ call <code>stream.end()</code> when this event is emitted.</p>
 
 <p><code>function () { }</code></p>
 
-<p>Emitted if the stream times out from inactivity. The
-<code>'close'</code> event will be emitted immediately following this event.</p>
+<p>Emitted if the stream times out from inactivity. This is only to notify that
+the stream has been idle. The user must manually close the connection.</p>
+
+<p>See also: <code>stream.setTimeout()</code></p>
 
 <h3>Event: 'drain'</h3>
 
@@ -2316,7 +2471,6 @@ server.</p>
 
 <p>This function is asynchronous. When the <code>'connect'</code> event is emitted the
 stream is established. If there is a problem connecting, the <code>'connect'</code>
-
 event will not be emitted, the <code>'error'</code> event will be emitted with
 the exception.</p>
 
@@ -2336,6 +2490,20 @@ the exception.</p>
 <p>Sets the encoding (either <code>'ascii'</code>, <code>'utf8'</code>, or <code>'binary'</code>) for data that is
 received.</p>
 
+<h3>stream.setSecure(credentials)</h3>
+
+<p>Enables HTTPS support for the stream, with the crypto module credentials specifying the private key and certificate of the stream, and optionally the CA certificates for use in peer authentication.</p>
+
+<p>If the credentials hold one ore more CA certificates, then the stream will request for the peer to submit a client certificate as part of the HTTPS connection handshake. The validity and content of this can be accessed via verifyPeer() and getPeerCertificate().</p>
+
+<h3>stream.verifyPeer()</h3>
+
+<p>Returns true or false depending on the validity of the peers's certificate in the context of the defined or default list of trusted CA certificates.</p>
+
+<h3>stream.getPeerCertificate()</h3>
+
+<p>Returns a JSON structure detailing the peer's certificate, containing a dictionary with keys for the certificate 'subject', 'issuer', 'valid_from' and 'valid_to'</p>
+
 <h3>stream.write(data, encoding='ascii')</h3>
 
 <p>Sends data on the stream. The second parameter specifies the encoding in
@@ -2350,7 +2518,6 @@ buffer. Returns <code>false</code> if all or part of the data was queued in user
 
 <p>Half-closes the stream. I.E., it sends a FIN packet. It is possible the
 server will still send some data. After calling this <code>readyState</code> will be
-
 <code>'readOnly'</code>.</p>
 
 <h3>stream.destroy()</h3>
@@ -2370,10 +2537,13 @@ Useful to throttle back an upload.</p>
 <h3>stream.setTimeout(timeout)</h3>
 
 <p>Sets the stream to timeout after <code>timeout</code> milliseconds of inactivity on
-the stream. By default all <code>net.Stream</code> objects have a timeout of 60
-seconds (60000 ms).</p>
+the stream. By default <code>net.Stream</code> do not have a timeout.</p>
 
-<p>If <code>timeout</code> is 0, then the idle timeout is disabled.</p>
+<p>When an idle timeout is triggered the stream will receive a <code>'timeout'</code>
+event but the connection will not be severed. The user must manually <code>end()</code>
+or <code>destroy()</code> the stream.</p>
+
+<p>If <code>timeout</code> is 0, then the existing idle timeout is disabled.</p>
 
 <h3>stream.setNoDelay(noDelay=true)</h3>
 
@@ -2389,6 +2559,112 @@ Set <code>initialDelay</code> (in milliseconds) to set the delay between the las
 data packet received and the first keepalive probe. Setting 0 for
 initialDelay will leave the value unchanged from the default
 (or previous) setting.</p>
+
+<h2 id="Crypto">Crypto</h2>
+
+<p>Use <code>require('crypto')</code> to access this module.</p>
+
+<p>The crypto module requires OpenSSL to be available on the underlying platform. It offers a way of encapsulating secure credentials to be used as part of a secure HTTPS net or http connection.</p>
+
+<p>It also offers a set of wrappers for OpenSSL's hash, hmac, cipher, decipher, sign and verify methods.</p>
+
+<h3>crypto.createCredentials(details)</h3>
+
+<p>Creates a credentials object, with the optional details being a dictionary with keys:</p>
+
+<p><code>key</code> : a string holding the PEM encoded private key</p>
+
+<p><code>cert</code> : a string holding the PEM encoded certificate</p>
+
+<p><code>ca</code> : either a string or list of strings of PEM encoded CA certificates to trust.</p>
+
+<p>If no 'ca' details are given, then node.js will use the default publicly trusted list of CAs as given in
+http://mxr.mozilla.org/mozilla/source/security/nss/lib/ckfw/builtins/certdata.txt</p>
+
+<h3>crypto.createHash(algorithm)</h3>
+
+<p>Creates and returns a hash object, a cryptographic hash with the given algorithm which can be used to generate hash digests.</p>
+
+<p><code>algorithm</code> is dependent on the available algorithms supported by the version of OpenSSL on the platform. Examples are sha1, md5, sha256, sha512, etc. On recent releases, <code>openssl list-message-digest-algorithms</code> will display the available digest algorithms.</p>
+
+<h3>hash.update(data)</h3>
+
+<p>Updates the hash content with the given <code>data</code>. This can be called many times with new data as it is streamed.</p>
+
+<h3>hash.digest(encoding)</h3>
+
+<p>Calculates the digest of all of the passed data to be hashed. The <code>encoding</code> can be 'hex', 'binary' or 'base64'.</p>
+
+<h3>crypto.createHmac(algorithm, key)</h3>
+
+<p>Creates and returns a hmac object, a cryptographic hmac with the given algorithm and key.</p>
+
+<p><code>algorithm</code> is dependent on the available algorithms supported by OpenSSL - see createHash above.
+<code>key</code> is the hmac key to be used.</p>
+
+<h3>hmac.update(data)</h3>
+
+<p>Update the hmac content with the given <code>data</code>. This can be called many times with new data as it is streamed.</p>
+
+<h3>hmac.digest(encoding)</h3>
+
+<p>Calculates the digest of all of the passed data to the hmac. The <code>encoding</code> can be 'hex', 'binary' or 'base64'.</p>
+
+<h3>crypto.createCipher(algorithm, key)</h3>
+
+<p>Creates and returns a cipher object, with the given algorithm and key.</p>
+
+<p><code>algorithm</code> is dependent on OpenSSL, examples are aes192, etc. On recent releases, <code>openssl list-cipher-algorithms</code> will display the available cipher algorithms.</p>
+
+<h3>cipher.update(data, input_encoding, output_encoding)</h3>
+
+<p>Updates the cipher with <code>data</code>, the encoding of which is given in <code>input_encoding</code> and can be 'utf8', 'ascii' or 'binary'. The <code>output_encoding</code> specifies the output format of the enciphered data, and can be 'binary', 'base64'  or 'hex'.</p>
+
+<p>Returns the enciphered contents, and can be called many times with new data as it is streamed.</p>
+
+<h3>cipher.final(output_encoding)</h3>
+
+<p>Returns any remaining enciphered contents, with <code>output_encoding</code> as update above.</p>
+
+<h3>crypto.createDecipher(algorithm, key)</h3>
+
+<p>Creates and returns a decipher object, with the given algorithm and key. This is the mirror of the cipher object above.</p>
+
+<h3>decipher.update(data, input_encoding, output_encoding)</h3>
+
+<p>Updates the decipher with <code>data</code>, which is encoded in 'binary', 'base64' or 'hex'. The <code>output_decoding</code> specifies in what format to return the deciphered plaintext - either 'binary', 'ascii' or 'utf8'.</p>
+
+<h3>decipher.final(output_encoding)</h3>
+
+<p>Returns any remaining plaintext which is deciphered, with `output_encoding' as update above.</p>
+
+<h3>crypto.createSign(algorithm)</h3>
+
+<p>Creates and returns a signing object, with the given algorithm. On recent OpenSSL releases, <code>openssl list-public-key-algorithms</code> will display the available signing algorithms. Examples are 'RSA-SHA256'.</p>
+
+<h3>signer.update(data)</h3>
+
+<p>Updates the signer object with data. This can be called many times with new data as it is streamed.</p>
+
+<h3>signer.sign(private_key, output_format)</h3>
+
+<p>Calculates the signature on all the updated data passed through the signer. <code>private_key</code> is a string containing the PEM encoded private key for signing.</p>
+
+<p>Returns the signature in <code>output_format</code> which can be 'binary', 'hex' or 'base64'</p>
+
+<h3>crypto.createVerify(algorithm)</h3>
+
+<p>Creates and returns a verification object, with the given algorithm. This is the mirror of the signing object above.</p>
+
+<h3>verifier.update(data)</h3>
+
+<p>Updates the verifyer object with data. This can be called many times with new data as it is streamed.</p>
+
+<h3>verifier.verify(public_key, signature, signature_format)</h3>
+
+<p>Verifies the signed data by using the <code>public_key</code> which is a string containing the PEM encoded public key, and <code>signature</code>, which is the previously calculates signature for the data, in the <code>signature_format</code> which can be 'binary', 'hex' or 'base64'.</p>
+
+<p>Returns true or false depending on the validity of the signature for the data and public key.</p>
 
 <h2 id="DNS">DNS</h2>
 
@@ -2409,9 +2685,11 @@ dns.resolve4('www.google.com', function (err, addresses) {
     var a = addresses[i];
     dns.reverse(a, function (err, domains) {
       if (err) {
-        sys.puts('reverse for ' + a + ' failed: ' + err.message);
+        sys.puts('reverse for ' + a + ' failed: ' + 
+          err.message);
       } else {
-        sys.puts('reverse for ' + a + ': ' + JSON.stringify(domains));
+        sys.puts('reverse for ' + a + ': ' + 
+          JSON.stringify(domains));
       }
     });
   }
@@ -2436,7 +2714,8 @@ the error in English.</p>
 <h3>dns.resolve4(domain, callback)</h3>
 
 <p>The same as <code>dns.resolve()</code>, but only for IPv4 queries (<code>A</code> records).
-<code>addresses</code> is an array of IPv4 addresses (e.g.  <code>['74.125.79.104', '74.125.79.105', '74.125.79.106']</code>).</p>
+<code>addresses</code> is an array of IPv4 addresses (e.g.<br />
+<code>['74.125.79.104', '74.125.79.105', '74.125.79.106']</code>).</p>
 
 <h3>dns.resolve6(domain, callback)</h3>
 
@@ -2452,16 +2731,15 @@ attribute (e.g. <code>[{'priority': 10, 'exchange': 'mx.example.com'},...]</code
 <h3>dns.resolveTxt(domain, callback)</h3>
 
 <p>The same as <code>dns.resolve()</code>, but only for text queries (<code>TXT</code> records).
-
 <code>addresses</code> is an array of the text records available for <code>domain</code> (e.g.,
 <code>['v=spf1 ip4:0.0.0.0 ~all']</code>).</p>
 
 <h3>dns.resolveSrv(domain, callback)</h3>
 
 <p>The same as <code>dns.resolve()</code>, but only for service records (<code>SRV</code> records).
-
 <code>addresses</code> is an array of the SRV records available for <code>domain</code>. Properties
-of SRV records are priority, weight, port, and name (e.g., <code>[{'priority': 10, {'weight': 5, 'port': 21223, 'name': 'service.example.com'}, ...]</code>).</p>
+of SRV records are priority, weight, port, and name (e.g.,
+<code>[{'priority': 10, {'weight': 5, 'port': 21223, 'name': 'service.example.com'}, ...]</code>).</p>
 
 <h3>dns.reverse(ip, callback)</h3>
 
@@ -2477,7 +2755,6 @@ object.</p>
 <ul>
 <li><code>dns.TEMPFAIL</code>: timeout, SERVFAIL or similar.</li>
 <li><code>dns.PROTOCOL</code>: got garbled reply.</li>
-
 <li><code>dns.NXDOMAIN</code>: domain does not exists.</li>
 <li><code>dns.NODATA</code>: domain exists but no data of reqd type.</li>
 <li><code>dns.NOMEM</code>: out of memory while processing.</li>
@@ -2539,7 +2816,8 @@ access it with <code>require('assert')</code>.</p>
 
 <p>Join all arguments together and resolve the resulting path.  Example:</p>
 
-<pre><code>node&gt; require('path').join('/foo', 'bar', 'baz/asdf', 'quux', '..')
+<pre><code>node&gt; require('path').join(
+...   '/foo', 'bar', 'baz/asdf', 'quux', '..')
 '/foo/bar/baz/asdf'
 </code></pre>
 
@@ -2560,7 +2838,6 @@ access it with <code>require('assert')</code>.</p>
 <pre><code>path.normalize('/foo/bar/baz/asdf/quux/..')
 // returns
 '/foo/bar/baz/asdf'
-
 </code></pre>
 
 <h3>path.dirname(p)</h3>
@@ -2604,7 +2881,7 @@ path.extname('index')
 <p>Test whether or not the given path exists.  Then, call the <code>callback</code> argument with either true or false.  Example:</p>
 
 <pre><code>path.exists('/etc/passwd', function (exists) {
-  sys.debug(exists ? 'it's there' : 'no passwd!');
+  sys.debug(exists ? "it's there" : "no passwd!");
 });
 </code></pre>
 
@@ -2653,7 +2930,6 @@ string will not be in the parsed object. Examples are shown for the URL</p>
 <li><p><code>hash</code></p>
 
 <p>The 'fragment' portion of the URL including the pound-sign. Example: <code>'#hash'</code></p></li>
-
 </ul>
 
 
@@ -2676,7 +2952,7 @@ the query string using the <code>querystring</code> module.</p>
 
 <p>This module provides utilities for dealing with query strings.  It provides the following methods:</p>
 
-<h3>querystring.stringify(obj, sep='&amp;', eq='=')</h3>
+<h3>querystring.stringify(obj, sep='&amp;', eq='=', munge=true)</h3>
 
 <p>Serialize an object to a query string.  Optionally override the default separator and assignment characters.
 Example:</p>
@@ -2684,7 +2960,35 @@ Example:</p>
 <pre><code>querystring.stringify({foo: 'bar'})
 // returns
 'foo=bar'
+
+querystring.stringify({foo: 'bar', baz: 'bob'}, ';', ':')
+// returns
+'foo:bar;baz:bob'
 </code></pre>
+
+<p>By default, this function will perform PHP/Rails-style parameter mungeing for arrays and objects used as
+values within <code>obj</code>.
+Example:</p>
+
+<pre><code>querystring.stringify({foo: 'bar', foo: 'baz', foo: 'boz'})
+// returns
+'foo[]=bar&amp;foo[]=baz&amp;foo[]=boz'
+
+querystring.stringify({foo: {bar: 'baz'}})
+// returns
+'foo[bar]=baz'
+</code></pre>
+
+<p>If you wish to disable the array mungeing (e.g. when generating parameters for a Java servlet), you
+can set the <code>munge</code> argument to <code>false</code>.
+Example:</p>
+
+<pre><code>querystring.stringify({foo: 'bar', foo: 'baz', foo: 'boz'}, '&amp;', '=', false)
+// returns
+'foo=bar&amp;foo=baz&amp;foo=boz'
+</code></pre>
+
+<p>Note that when <code>munge</code> is <code>false</code>, parameter names with object values will still be munged.</p>
 
 <h3>querystring.parse(str, sep='&amp;', eq='=')</h3>
 
@@ -2696,6 +3000,8 @@ Example:</p>
 , 'b': 'c'
 }
 </code></pre>
+
+<p>This function can parse both munged and unmunged query strings (see <code>stringify</code> for details).</p>
 
 <h3>querystring.escape</h3>
 
@@ -2729,14 +3035,12 @@ node&gt; a.forEach(function (v) {
 1
 2
 3
-
 </code></pre>
 
 <h3>repl.start(prompt, stream)</h3>
 
-<p>Starts a REPL with <code>prompt</code> as the prompt and <code>stream</code> for all I/O.  <code>pomrpt</code>
+<p>Starts a REPL with <code>prompt</code> as the prompt and <code>stream</code> for all I/O.  <code>prompt</code>
 is optional and defaults to <code>node&gt;</code>.  <code>stream</code> is optional and defaults to
-
 <code>process.openStdin()</code>.</p>
 
 <p>Multiple REPLs may be started against the same running instance of node.  Each
@@ -2761,7 +3065,6 @@ net.createServer(function (socket) {
   connections += 1;
   repl.start("node via TCP socket&gt; ", socket);
 }).listen(5001);
-
 </code></pre>
 
 <p>Running this program from the command line will start a REPL on stdin.  Other
@@ -2779,7 +3082,7 @@ or <code>socat</code>.  These programs are available from many Unix package mana
 
 <p>To start the standalone REPL with <code>rlwrap</code>:</p>
 
-<pre><code>rlwarp node-repl
+<pre><code>rlwrap node-repl
 </code></pre>
 
 <p>It might be convenient to use this alias in your shell configuration:</p>
@@ -2809,7 +3112,6 @@ node&gt; _.length
 3
 node&gt; _ += 1
 4
-
 </code></pre>
 
 <p>The REPL provides access to any variables in the global scope. You can expose a variable
@@ -2818,9 +3120,9 @@ to the REPL explicitly by assigning it to the <code>scope</code> object associat
 
 <pre><code>// repl_test.js
 var repl = require("repl"),
-    message = "message";
+    msg = "message";
 
-repl.start().scope.m = message;
+repl.start().scope.m = msg;
 </code></pre>
 
 <p>Things in the <code>scope</code> object appear as local within the REPL:</p>
@@ -2835,11 +3137,76 @@ node&gt; m
 <ul>
 <li><p><code>.break</code> - While inputting a multi-line expression, sometimes you get lost or just don't care
 about completing it.  <code>.break</code> will start over.</p></li>
-
 <li><p><code>.clear</code> - Resets the <code>scope</code> object to an empty object and clears any multi-line expression.</p></li>
 <li><p><code>.exit</code> - Close the I/O stream, which will cause the REPL to exit.</p></li>
 <li><p><code>.help</code> - Show this list of special commands.</p></li>
 </ul>
+
+
+<h2 id="Modules">Modules</h2>
+
+<p>Node uses the CommonJS module system.</p>
+
+<p>Node has a simple module loading system.  In Node, files and modules are in
+one-to-one correspondence.  As an example, <code>foo.js</code> loads the module
+<code>circle.js</code> in the same directory.</p>
+
+<p>The contents of <code>foo.js</code>:</p>
+
+<pre><code>var circle = require('./circle'),
+    sys = require('sys');
+sys.puts( 'The area of a circle of radius 4 is '
+  + circle.area(4));
+</code></pre>
+
+<p>The contents of <code>circle.js</code>:</p>
+
+<pre><code>var PI = 3.14;
+
+exports.area = function (r) {
+  return PI * r * r;
+};
+
+exports.circumference = function (r) {
+  return 2 * PI * r;
+};
+</code></pre>
+
+<p>The module <code>circle.js</code> has exported the functions <code>area()</code> and
+<code>circumference()</code>.  To export an object, add to the special <code>exports</code>
+object.  (Alternatively, one can use <code>this</code> instead of <code>exports</code>.) Variables
+local to the module will be private. In this example the variable <code>PI</code> is
+private to <code>circle.js</code>. The function <code>puts()</code> comes from the module <code>'sys'</code>,
+which is a built-in module. Modules which are not prefixed by <code>'./'</code> are
+built-in module--more about this later.</p>
+
+<p>A module prefixed with <code>'./'</code> is relative to the file calling <code>require()</code>.
+That is, <code>circle.js</code> must be in the same directory as <code>foo.js</code> for
+<code>require('./circle')</code> to find it.</p>
+
+<p>Without the leading <code>'./'</code>, like <code>require('assert')</code> the module is searched
+for in the <code>require.paths</code> array. <code>require.paths</code> on my system looks like
+this:</p>
+
+<p><code>[ '/home/ryan/.node_libraries' ]</code></p>
+
+<p>That is, when <code>require('assert')</code> is called Node looks for:</p>
+
+<ul>
+<li>1: <code>/home/ryan/.node_libraries/assert.js</code></li>
+<li>2: <code>/home/ryan/.node_libraries/assert.node</code></li>
+<li>3: <code>/home/ryan/.node_libraries/assert/index.js</code></li>
+<li>4: <code>/home/ryan/.node_libraries/assert/index.node</code></li>
+</ul>
+
+
+<p>interrupting once a file is found. Files ending in <code>'.node'</code> are binary Addon
+Modules; see 'Addons' below. <code>'index.js'</code> allows one to package a module as
+a directory.</p>
+
+<p><code>require.paths</code> can be modified at runtime by simply unshifting new
+paths onto it, or at startup with the <code>NODE_PATH</code> environmental
+variable (which should be a list of paths, colon separated).</p>
 
 <h2 id="Addons">Addons</h2>
 
@@ -2856,15 +3223,13 @@ descriptor to become readable, wait for a timer, or wait for a signal to
 received one will need to interface with libev.  That is, if you perform
 any I/O, libev will need to be used.  Node uses the <code>EV_DEFAULT</code> event
 loop.  Documentation can be found http:/cvs.schmorp.de/libev/ev.html[here].</p></li>
-
 <li><p>libeio, C thread pool library. Used to execute blocking POSIX system
 calls asynchronously. Mostly wrappers already exist for such calls, in
 <code>src/file.cc</code> so you will probably not need to use it. If you do need it,
 look at the header file <code>deps/libeio/eio.h</code>.</p></li>
-<li><p>Internal Node libraries. Most importantly is the <code>node::EventEmitter</code>
+<li><p>Internal Node libraries. Most importantly is the <code>node::ObjectWrap</code>
 class which you will likely want to derive from.</p></li>
 <li><p>Others. Look in <code>deps/</code> for what else is available.</p></li>
-
 </ul>
 
 
@@ -2921,13 +3286,12 @@ provided for the ease of users.</p>
 
 <p>All Node addons must export a function called <code>init</code> with this signature:</p>
 
-<pre><code>extern 'C' void init (Handle&lt;Object> target) 
+<pre><code>extern 'C' void init (Handle&lt;Object> target)
 </code></pre>
 
 <p>For the moment, that is all the documentation on addons. Please see
-<a href="http://github.com/ry/node_postgres[node_postgres]">http://github.com/ry/node_postgres[node_postgres]</a> for a real example.</p>
+<a href="http://github.com/ry/node_postgres">http://github.com/ry/node_postgres</a> for a real example.</p>
 </div>
-
 </div>
 <script type="text/javascript" src="http://nodejs.org/jquery.js"></script>
 <script type="text/javascript" src="http://nodejs.org/sh_main.js"></script>
