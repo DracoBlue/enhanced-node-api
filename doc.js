@@ -27,7 +27,7 @@ var ManPageFilter = function() {
     this.search_result_info = this.setupSearchResultInfo();
     var search_field = this.setupSearchField();
 
-    this.filter_box_relative.after($('<button style="width: 22px; margin-left: 5px">X</button>').click(function() {
+    this.filter_box_relative.after($('<input type="button" style="float:left; width: 22px; margin-left: 5px" value="X" />').click(function() {
         search_field.val('');
         self.filterForText('');
         search_field.focus();
@@ -36,6 +36,8 @@ var ManPageFilter = function() {
     this.filter_box_relative.after($('<div style="font-size: 70%">Filter:</div>'));
     $('h1').after(this.search_result_info);
 
+    this.setupFloatingSectionHeader();
+    
     this.setupUnofficialNotice();
     search_field.focus();
 };
@@ -47,7 +49,7 @@ ManPageFilter.prototype.setupSearchResultInfo = function() {
 ManPageFilter.prototype.setupSearchField = function() {
     var self = this;
 
-    var search_field = $('<input style="width: 140px; margin-bottom: 10px;" />');
+    var search_field = $('<input style="float:left; width: 140px; margin-bottom: 10px;" />');
 
     this.previous_text = "";
 
@@ -124,6 +126,8 @@ ManPageFilter.prototype.filterForText = function(text) {
         this.search_result_info.slideDown();
     }
     
+    this.triggerScrollHandler();
+    
     this.man_content_container.css('visibility', '');
 };
 
@@ -194,7 +198,7 @@ ManPageFilter.prototype.setupUnofficialNotice = function() {
  * Take a given element (is either h2, h3 or h4) and create a navigation node
  * for this element.
  */
-ManPageFilter.prototype.createNavigationNode = function(element) {
+ManPageFilter.prototype.createNavigationNode = function(element, level) {
     element = $(element);
 
     var new_navigation_element = $('<li />');
@@ -203,6 +207,10 @@ ManPageFilter.prototype.createNavigationNode = function(element) {
     var new_navigaton_element_link = $('<a href="#' + element.attr('id') + '" />');
     new_navigaton_element_link.text(element.text().replace(/\(.*\)$/gi, ""));
 
+    if (level === 1) {
+        this.headlines.push([element, new_navigation_element]);
+    }
+    
     new_navigaton_element_link.click(function(event) {
         /*
          * It's unknown, because invisible? Let's go to top!
@@ -334,8 +342,10 @@ ManPageFilter.prototype.initializeData = function() {
      * The stack is like a bread crumb for the current element.
      */
 
-    this.table_of_contents = $('<ul />')[0];
+    this.table_of_contents = $('<ul style="clear: both"/>')[0];
 
+    this.headlines = [];
+    
     /**
      * Stack contains the dom_element for the parent, which holds all children
      */
@@ -384,7 +394,7 @@ ManPageFilter.prototype.initializeData = function() {
 
         if (typeof is_header_tag[tag_name] !== 'undefined') {
             new_level = Number(tag_name.substr(1, 1)) - 1;
-
+            
             /*
              * Let's remember where we started with headings, so we won't hide
              * anything except the content.
@@ -417,7 +427,7 @@ ManPageFilter.prototype.initializeData = function() {
              * Finally all depth issues are resolved, now let's create the node.
              */
 
-            element_navigation_node[i] = this.createNavigationNode(element);
+            element_navigation_node[i] = this.createNavigationNode(element, level);
 
             /*
              * Ok, we don't have that <ul> for the children, yet.
@@ -468,6 +478,91 @@ ManPageFilter.prototype.initializeData = function() {
         element_search_texts[e] = element_search_texts[e].join(' ');
     }
 };
+
+/**
+ * If a scroll was performed, we want to check whether we are in a new
+ * section or not. This handler performs this operation, highlights
+ * the current section and adds a floating header.
+ */
+ManPageFilter.prototype.setupFloatingSectionHeader = function() {
+    var self = this;
+    var scroll_timeout = null;
+    
+	var headlines = this.headlines;
+    var headlines_length = headlines.length;
+
+    var last_current_section = null;
+    var last_current_section_link = null;
+    
+    var floating_header = null;
+
+    /**
+     * Handler to perform the floating header and selected section work
+     * on the navigation.
+     */
+    this.onScrollHandler = function() {
+        var body_center = $('body').scrollTop()+10;
+
+        var current_section = null;
+        var current_section_li = null;
+        
+        for (var i = 0; i < headlines_length; i++) {
+            var headline = headlines[i][0];
+            var headline_li = headlines[i][1];
+            if (headline.css('display') !== 'none') {
+                if (headline.offset().top < body_center) {
+                    current_section = headline;
+                    current_section_li = headline_li;
+                }
+            }
+        }
+        
+        if (current_section === null) {
+            if (floating_header) {
+                floating_header.remove();
+                floating_header = null;
+                last_current_section_li.removeClass('active');
+            }
+        } else {
+            if (last_current_section !== current_section) {
+                if (floating_header) {
+                    floating_header.remove();
+                    last_current_section_li.removeClass('active');
+                }
+                floating_header = current_section.clone();
+                floating_header.width(current_section.width());
+                floating_header.addClass('current-section');
+                current_section.after(floating_header);
+                current_section_li.addClass('active');
+            }
+        }
+        
+        last_current_section = current_section;
+        last_current_section_li = current_section_li;
+    };
+
+    
+	this.triggerScrollHandler();
+	
+	$('#man').scroll(function() {
+	    self.triggerScrollHandler()
+	});
+};
+
+/**
+ * Trigger the scroll handler. This one won't be executed right away, but waits
+ * 200ms until it really executes the onScrollHandler. This is necessary, because
+ * scroll is triggered way to often.
+ */
+ManPageFilter.prototype.triggerScrollHandler = (function() {
+    var scroll_timeout = null;
+    return function() {
+        if (scroll_timeout) {
+            clearTimeout(scroll_timeout);
+        }
+        scroll_timeout = setTimeout(this.onScrollHandler, 200);
+    };
+})();
 
 new ManPageFilter();
 
