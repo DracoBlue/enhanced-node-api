@@ -290,12 +290,12 @@
 			padding: 10px;
 		}
 	</style>
-<link rel="stylesheet" href="http://nodejs.org/sh_vim-dark.css" type="text/css" />
+<link rel="stylesheet" href="./sh_vim-dark.css" type="text/css" />
 </head>
 <body>
 
 <div id="toc">
-	<div id="toctitle">Node v0.1.95</div>
+	<div id="toctitle">Node v0.1.97</div>
 	<noscript>JavaScript must be enabled in your browser to display the table of contents.</noscript>
 </div>
 <div id='man'>
@@ -377,6 +377,14 @@ strip the high bit if set.</p></li>
 <h3>new Buffer(size)</h3>
 
 <p>Allocates a new buffer of <code>size</code> octets.</p>
+
+<h3>new Buffer(array)</h3>
+
+<p>Allocates a new buffer using an <code>array</code> of octets.</p>
+
+<h3>new Buffer(str, encoding = 'utf8')</h3>
+
+<p>Allocates a new buffer containing the given <code>str</code>.</p>
 
 <h3>buffer.write(string, encoding, offset)</h3>
 
@@ -967,6 +975,13 @@ try {
 catch (err) {
   sys.puts('Failed to set uid: ' + err);
 }
+</code></pre>
+
+<h3>process.version</h3>
+
+<p>A compiled-in property that exposes <code>NODE_VERSION</code>.</p>
+
+<pre><code>require('sys').puts('Version: ' + process.version);
 </code></pre>
 
 <h3>process.installPrefix</h3>
@@ -1678,11 +1693,15 @@ or 'a+'. The callback gets two arguments <code>(err, fd)</code>.</p>
 
 <p>Synchronous open(2).</p>
 
-<h3>fs.write(fd, data, position, encoding, callback)</h3>
+<h3>fs.write(fd, buffer, offset, length, position, callback)</h3>
 
-<p>Write data to the file specified by <code>fd</code>.  <code>position</code> refers to the offset
-from the beginning of the file where this data should be written. If
-<code>position</code> is <code>null</code>, the data will be written at the current position.
+<p>Write <code>buffer</code> to the file specified by <code>fd</code>.</p>
+
+<p><code>offset</code> and <code>length</code> determine the part of the buffer to be written.</p>
+
+<p><code>position</code> refers to the offset from the beginning of the file where this data
+should be written. If <code>position</code> is <code>null</code>, the data will be written at the
+current position.
 See pwrite(2).</p>
 
 <p>The callback will be given two arguments <code>(err, written)</code> where <code>written</code>
@@ -1692,20 +1711,24 @@ specifies how many <em>bytes</em> were written.</p>
 
 <p>Synchronous version of <code>fs.write()</code>. Returns the number of bytes written.</p>
 
-<h3>fs.read(fd, length, position, encoding, callback)</h3>
+<h3>fs.read(fd, buffer, offset, length, position, callback)</h3>
 
 <p>Read data from the file specified by <code>fd</code>.</p>
 
+<p><code>buffer</code> is the buffer that the data will be written to.</p>
+
+<p><code>offset</code> is offset within the buffer where writing will start.</p>
+
 <p><code>length</code> is an integer specifying the number of bytes to read.</p>
 
-<p><code>position</code> is an integer specifying where to begin reading from in the file.</p>
+<p><code>position</code> is an integer specifying where to begin reading from in the file.
+If <code>position</code> is <code>null</code>, data will be read from the current file position.</p>
 
-<p>The callback is given three arguments, <code>(err, data, bytesRead)</code> where <code>data</code>
-is a string--what was read--and <code>bytesRead</code> is the number of bytes read.</p>
+<p>The callback is given the two arguments, <code>(err, bytesRead)</code>.</p>
 
-<h3>fs.readSync(fd, length, position, encoding)</h3>
+<h3>fs.readSync(fd, buffer, offset, length, position)</h3>
 
-<p>Synchronous version of <code>fs.read</code>. Returns an array <code>[data, bytesRead]</code>.</p>
+<p>Synchronous version of <code>fs.read</code>. Returns the number of <code>bytesRead</code>.</p>
 
 <h3>fs.readFile(filename, [encoding,] callback)</h3>
 
@@ -1722,9 +1745,12 @@ contents of the file.</p>
 
 <p>If no encoding is specified, then the raw buffer is returned.</p>
 
-<h3>fs.readFileSync(filename, encoding='utf8')</h3>
+<h3>fs.readFileSync(filename [, encoding])</h3>
 
 <p>Synchronous version of <code>fs.readFile</code>. Returns the contents of the <code>filename</code>.</p>
+
+<p>If <code>encoding</code> is specified then this function returns a string. Otherwise it
+returns a buffer.</p>
 
 <h3>fs.writeFile(filename, data, encoding='utf8', callback)</h3>
 
@@ -1890,14 +1916,13 @@ parse the actual headers or the body.</p>
 <p> <code>request</code> is an instance of <code>http.ServerRequest</code> and <code>response</code> is
  an instance of <code>http.ServerResponse</code></p>
 
-<h3>Event: 'stream'</h3>
+<h3>Event: 'connection'</h3>
 
 <p><code>function (stream) { }</code></p>
 
-<p> When a new TCP stream is established.
- <code>stream</code> is an object of type <code>http.Connection</code>. Usually users
- will not want to access this event. The <code>stream</code> can also be
- accessed at <code>request.stream</code>.</p>
+<p> When a new TCP stream is established. <code>stream</code> is an object of type
+ <code>net.Stream</code>. Usually users will not want to access this event. The
+ <code>stream</code> can also be accessed at <code>request.connection</code>.</p>
 
 <h3>Event: 'close'</h3>
 
@@ -2073,7 +2098,9 @@ to <code>'binary'</code>.</p>
 
 <p>The <code>net.Stream</code> object assocated with the connection.</p>
 
-<p>With HTTPS support, use request.connection.verifyPeer() and request.connection.getPeerCertificate() to obtain the client's authentication details.</p>
+<p>With HTTPS support, use request.connection.verifyPeer() and
+request.connection.getPeerCertificate() to obtain the client's
+authentication details.</p>
 
 <h2 id="http.ServerResponse">http.ServerResponse</h2>
 
@@ -2223,8 +2250,9 @@ request.addListener('response', function (response) {
 });
 </code></pre>
 
-<p>This is a writable stream.
-This is an <code>EventEmitter</code> with the following events:</p>
+<p>This is a writable stream.</p>
+
+<p>This is an <code>EventEmitter</code> with the following events:</p>
 
 <h3>Event 'response'</h3>
 
@@ -2807,6 +2835,10 @@ access it with <code>require('assert')</code>.</p>
 
 <p>Expects <code>block</code> not to throw an error.</p>
 
+<h3>assert.ifError(value)</h3>
+
+<p>Tests if value is not a false value, throws if it is a true value. Useful when testing the first argument, <code>error</code> in callbacks.</p>
+
 <h2 id="Path">Path</h2>
 
 <p>This module contains utilities for dealing with file paths.  Use
@@ -2864,8 +2896,9 @@ path.basename('/foo/bar/baz/asdf/quux.html', '.html')
 
 <h3>path.extname(p)</h3>
 
-<p>Return the extension of the path.  Everything after the last '.', if there
-is no '.' then it returns an empty string.  Examples:</p>
+<p>Return the extension of the path.  Everything after the last '.' in the last portion
+of the path.  If there is no '.' in the last portion of the path or the only '.' is
+the first character, then it returns an empty string.  Examples:</p>
 
 <pre><code>path.extname('index.html')
 // returns 
@@ -3293,9 +3326,9 @@ provided for the ease of users.</p>
 <a href="http://github.com/ry/node_postgres">http://github.com/ry/node_postgres</a> for a real example.</p>
 </div>
 </div>
-<script type="text/javascript" src="http://nodejs.org/jquery.js"></script>
-<script type="text/javascript" src="http://nodejs.org/sh_main.js"></script>
-<script type="text/javascript" src="http://nodejs.org/sh_javascript.min.js"></script>
+<script type="text/javascript" src="./jquery.js"></script>
+<script type="text/javascript" src="./sh_main.js"></script>
+<script type="text/javascript" src="./sh_javascript.min.js"></script>
 <script type="text/javascript" src="./doc.js"></script>
 </body>
 </html>
